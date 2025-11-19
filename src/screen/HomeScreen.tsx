@@ -1,12 +1,14 @@
 import {
+  Button,
   List,
   ProductCard,
+  useNavigateWithTransition,
   usePopularProducts,
 } from "@shopify/shop-minis-react";
 
 export default function HomeScreen() {
   const { products, fetchMore } = usePopularProducts();
-
+  const navigate = useNavigateWithTransition();
 
   const productRows = products
     ? Array.from({ length: Math.ceil(products.length / 2) }, (_, i) =>
@@ -15,9 +17,10 @@ export default function HomeScreen() {
     : [];
   return (
     <div className="pt-12 px-4 pb-6 bg-gray-300 min-h-screen">
-      <h1 className="text-2xl font-bold mb-2 text-center">
-        Welcome to Shop Minis!
-      </h1>
+      <h1 className="text-2xl font-bold mb-2 text-center">DealSpot</h1>
+      <Button onClick={() => navigate("/full-list")}>
+        Shop All
+      </Button>
       <List
         items={productRows}
         height={screen.height - 150}
