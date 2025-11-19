@@ -1,7 +1,7 @@
 import { MinisRouter } from "@shopify/shop-minis-react";
 import { Routes, Route } from "react-router";
-import HomeScreen from "./screen/HomeScreen";
-import FullListScreen from "./screen/FullListScreen";
+import HomeScreen from "./screens/HomeScreen";
+import FullListScreen from "./screens/FullListScreen";
 
 export default function App() {
   return (

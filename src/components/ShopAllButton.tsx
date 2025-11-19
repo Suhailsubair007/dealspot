@@ -1,11 +1,21 @@
-import React from 'react'
+import { Button } from "@shopify/shop-minis-react";
 
-const ShopAllButton = () => {
-  return (
-    <div>
-      
-    </div>
-  )
+interface ShopAllButtonProps {
+  onClick: () => void;
+  label?: string;
 }
 
-export default ShopAllButton
+export default function ShopAllButton({
+  onClick,
+  label = "Shop all",
+}: ShopAllButtonProps) {
+  return (
+    <Button
+      className="w-full rounded-2xl py-3 text-sm font-semibold"
+      variant="secondary"
+      onClick={onClick}
+    >
+      {label}
+    </Button>
+  );
+}
