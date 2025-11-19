@@ -1,7 +1,5 @@
 {
   "name": "dealspot",
   "permissions": [],
-  "scopes": [
-    "product_list:write"
-  ]
+  "scopes": ["product_list:write", "product_list:read"]
 }
