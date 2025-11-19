@@ -20,7 +20,7 @@ DealSpot is a simple Shopify Shop Mini created to help users easily discover dis
 
 - Shopify Shop Minis SDK  
 - React  
-- JavaScript / TypeScript  
+- TypeScript  
 
 ---
 
@@ -30,8 +30,12 @@ DealSpot is a simple Shopify Shop Mini created to help users easily discover dis
    ```
    npm init @shopify/shop-mini@latest
    ```
+2. Install the dependecies:  
+   ```
+   npm install
+   ```   
 
-2. Start the development server:  
+3. Start the development server:  
    ```
    npx shop-minis dev
    ```
