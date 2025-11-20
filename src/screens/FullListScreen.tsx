@@ -1,13 +1,12 @@
 import {
-  Button,
   List,
   ProductCard,
   useNavigateWithTransition,
   usePopularProducts,
 } from "@shopify/shop-minis-react";
+import { ArrowLeft, TrendingUp, Zap, Star, Store, Package } from "lucide-react";
 import { useMemo } from "react";
 import { useLocation } from "react-router";
-import Header from "../components/Header";
 import {
   getMegaDeals,
   getPopularProducts,
@@ -17,26 +16,38 @@ import {
 
 type SectionType = "topDeals" | "megaDeals" | "popular" | "storeDeals";
 
+const getSectionIcon = (type: SectionType) => {
+  switch (type) {
+    case "topDeals":
+      return TrendingUp;
+    case "megaDeals":
+      return Zap;
+    case "popular":
+      return Star;
+    case "storeDeals":
+      return Store;
+    default:
+      return Package;
+  }
+};
+
 export default function FullListScreen() {
-  const { products: popularProducts } = usePopularProducts({ first: 100 });
+  const { products: popularProducts } = usePopularProducts({ first: 50 });
   const navigate = useNavigateWithTransition();
   const location = useLocation();
   const searchParams = useMemo(
     () => new URLSearchParams(location.search),
-    [location.search],
+    [location.search]
   );
 
   const type = (searchParams.get("type") ?? "topDeals") as SectionType;
   const storeFromParams = searchParams.get("store");
 
-  const productPool = useMemo(
-    () => popularProducts ?? [],
-    [popularProducts],
-  );
+  const productPool = useMemo(() => popularProducts ?? [], [popularProducts]);
 
   const storeWise = useMemo(
     () => getStoreWiseDeals(productPool),
-    [productPool],
+    [productPool]
   );
 
   const derivedProducts = useMemo(() => {
@@ -50,9 +61,7 @@ export default function FullListScreen() {
           return storeWise[storeFromParams] ?? [];
         }
 
-        return Object.values(storeWise)
-          .flat()
-          .slice(0, 20);
+        return Object.values(storeWise).flat().slice(0, 20);
       case "topDeals":
       default:
         return getTopDeals(productPool);
@@ -68,32 +77,45 @@ export default function FullListScreen() {
       : "Store-wise Deals",
   };
 
-  return (
-    <div className="flex min-h-screen flex-col bg-white px-4 pb-10 pt-6">
-      <Button
-        className="self-start text-sm font-medium text-indigo-600"
-        onClick={() => navigate(-1)}
-      >
-        Back
-      </Button>
-      <Header />
-      <h2 className="mt-4 text-xl font-semibold">
-        {sectionTitleMap[type] ?? "Deals"}
-      </h2>
+  const Icon = getSectionIcon(type);
 
-      <div className="mt-4">
+  return (
+    <div className="min-h-screen bg-gradient-to-b from-[#CCCCFF]/10 via-white to-white">
+      {/* Header Section with Gradient */}
+      <div className="bg-gradient-to-br from-[#CCCCFF] via-[#A3A3CC] to-[#5C5C99] pt-6 pb-6 px-4 rounded-b-3xl shadow-lg">
+        <button
+          className="mb-4 p-2.5 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition-all duration-200"
+          onClick={() => navigate(-1)}
+        >
+          <ArrowLeft className="w-5 h-5 text-white" strokeWidth={2.5} />
+        </button>
+        <div className="flex items-center gap-3">
+          <div className="p-2.5 rounded-xl bg-white/30 backdrop-blur-sm border border-white/40">
+            <Icon className="w-6 h-6 text-white" strokeWidth={2.5} />
+          </div>
+          <h2 className="text-2xl font-bold text-white drop-shadow-md">
+            {sectionTitleMap[type] ?? "Deals"}
+          </h2>
+        </div>
+      </div>
+
+      <div className="px-4 pb-6 pt-6">
         {derivedProducts.length === 0 ? (
-          <p className="text-sm text-gray-500">
-            We’re loading fresh deals for you. Check back in a moment.
-          </p>
+          <div className="flex flex-col items-center justify-center py-16">
+            <Package className="w-16 h-16 text-[#A3A3CC] mb-4" strokeWidth={1.5} />
+            <p className="text-base text-gray-600 font-medium text-center">
+              We're loading fresh deals for you. Check back in a moment.
+            </p>
+          </div>
         ) : (
           <List
             items={derivedProducts}
             horizontalDirection={false}
             showScrollbar={false}
+            height={600}
             renderItem={(product) => (
-              <div className="py-2">
-                <ProductCard product={product} />
+              <div className="mb-4 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
+                <ProductCard  product={product} />
               </div>
             )}
           />
@@ -102,4 +124,3 @@ export default function FullListScreen() {
     </div>
   );
 }
-
