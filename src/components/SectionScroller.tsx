@@ -1,6 +1,15 @@
 import { Card, ProductCard } from "@shopify/shop-minis-react";
 import type { Product } from "@shopify/shop-minis-react";
-import { TrendingUp, Zap, Star, Store, Package } from "lucide-react";
+import {
+  TrendingUp,
+  Zap,
+  Star,
+  Store,
+  Package,
+} from "lucide-react";
+import { useEffect, useMemo } from "react";
+import useEmblaCarousel from "embla-carousel-react";
+import Autoplay from "embla-carousel-autoplay";
 import ShopAllButton from "./ShopAllButton";
 
 interface SectionScrollerProps {
@@ -35,6 +44,43 @@ export default function SectionScroller({
 }: SectionScrollerProps) {
   const hasProducts = products.length > 0;
   const Icon = getSectionIcon(title);
+  const loopCarousel = products.length > 3;
+
+  const shimmeredProducts = useMemo(() => {
+    if (!loopCarousel) {
+      return products;
+    }
+
+    // Duplicate the products to create an endless shimmer effect
+    return [...products, ...products];
+  }, [loopCarousel, products]);
+
+  const [emblaRef, emblaApi] = useEmblaCarousel(
+    {
+      align: "start",
+      loop: loopCarousel,
+      containScroll: "trimSnaps",
+      dragFree: true,
+      skipSnaps: false,
+    },
+    [
+      Autoplay({
+        delay: 4200,
+        stopOnInteraction: false,
+        stopOnMouseEnter: true,
+        stopOnLastSnap: false,
+      }),
+    ]
+  );
+
+  useEffect(() => {
+    if (!emblaApi) return;
+
+    return () => {
+      if (!emblaApi) return;
+      emblaApi.destroy();
+    };
+  }, [emblaApi]);
 
   return (
     <section className="mb-6">
@@ -50,20 +96,24 @@ export default function SectionScroller({
         </div>
       </div>
 
-      <Card className="mt-2 rounded-3xl border-2 border-[#CCCCFF]/30 bg-gradient-to-br from-white to-[#CCCCFF]/5 px-3 py-4 shadow-lg backdrop-blur-sm">
+      <Card className="mt-2 rounded-3xl border-2 border-[#CCCCFF]/30 bg-gradient-to-br from-white to-[#CCCCFF]/10 px-3 py-5 shadow-xl backdrop-blur-md relative overflow-hidden">
         {hasProducts ? (
-          <div className="flex gap-3 overflow-x-auto pb-2 [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
-            {products.map((product) => (
-              <div
-                key={product.id}
-                className="w-44 flex-shrink-0 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300"
-              >
-                <ProductCard product={product} />
+          <>
+            <div ref={emblaRef} className="overflow-hidden">
+              <div className="flex gap-4">
+                {shimmeredProducts.map((product, index) => (
+                  <div
+                    key={`${product.id}-${index}`}
+                    className="flex-[0_0_70%] min-w-0 rounded-3xl overflow-hidden shadow-lg"
+                  >
+                    <ProductCard product={product} />
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+          </>
         ) : (
-          <div className="flex flex-col items-center justify-center py-8">
+          <div className="flex flex-col items-center justify-center py-10">
             <Package className="w-12 h-12 text-[#A3A3CC] mb-3" strokeWidth={1.5} />
             <p className="text-sm text-gray-500 font-medium">
               Hang tight — we're loading fresh deals.
@@ -71,7 +121,7 @@ export default function SectionScroller({
           </div>
         )}
 
-        <div className="mt-4">
+        <div className="mt-5">
           <ShopAllButton label="Shop all" onClick={onShopAll} />
         </div>
       </Card>

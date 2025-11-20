@@ -2,6 +2,12 @@ import { Card } from "@shopify/shop-minis-react";
 import { Sparkles, ShoppingBag } from "lucide-react";
 
 export default function Header() {
+  const vibeTags = [
+    "Exclusive drops",
+    "Limited stock",
+    "Price drops",
+    "Editors' picks",
+  ];
   return (
     <Card className="mb-6 relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#CCCCFF] via-[#A3A3CC] to-[#5C5C99] px-5 py-6 text-white shadow-xl border-0">
       {/* Decorative background pattern */}
@@ -9,7 +15,7 @@ export default function Header() {
         <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full blur-2xl" />
       </div>
-      
+
       <div className="relative z-10 flex w-full flex-col justify-between">
         <div className="flex items-start justify-between">
           <div>
@@ -30,6 +36,16 @@ export default function Header() {
         <p className="mt-5 text-sm text-white/95 leading-relaxed font-medium">
           Top Deals, Mega Discounts &amp; Popular Picks — all in one place.
         </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {vibeTags.map((tag) => (
+            <span
+              key={tag}
+              className="px-3 py-1 rounded-full bg-white/20 text-xs font-semibold tracking-wide border border-white/30"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
       </div>
     </Card>
   );
