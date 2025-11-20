@@ -1,5 +1,6 @@
 import { Card } from "@shopify/shop-minis-react";
 import { Sparkles, ShoppingBag } from "lucide-react";
+import { HEADER_VIBE_TAGS } from "../constants";
 
 export default function Header() {
   return (
@@ -9,7 +10,7 @@ export default function Header() {
         <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full blur-3xl" />
         <div className="absolute bottom-0 left-0 w-24 h-24 bg-white rounded-full blur-2xl" />
       </div>
-      
+
       <div className="relative z-10 flex w-full flex-col justify-between">
         <div className="flex items-start justify-between">
           <div>
@@ -30,6 +31,16 @@ export default function Header() {
         <p className="mt-5 text-sm text-white/95 leading-relaxed font-medium">
           Top Deals, Mega Discounts &amp; Popular Picks — all in one place.
         </p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          {HEADER_VIBE_TAGS.map((tag) => (
+            <span
+              key={tag}
+              className="px-3 py-1 rounded-full bg-white/20 text-xs font-semibold tracking-wide border border-white/30"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
       </div>
     </Card>
   );

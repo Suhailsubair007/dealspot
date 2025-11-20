@@ -4,7 +4,7 @@ import {
   useNavigateWithTransition,
   usePopularProducts,
 } from "@shopify/shop-minis-react";
-import { ArrowLeft, TrendingUp, Zap, Star, Store, Package } from "lucide-react";
+import { ArrowLeft, Package } from "lucide-react";
 import { useMemo } from "react";
 import { useLocation } from "react-router";
 import {
@@ -13,26 +13,23 @@ import {
   getStoreWiseDeals,
   getTopDeals,
 } from "../utils/productUtils";
+import {
+  DEAL_SECTION_ICON_MAP,
+  DEAL_SECTION_META,
+  DEFAULT_PRODUCTS_FETCH_COUNT,
+  DEFAULT_SECTION_TYPE,
+  FULL_LIST_LIST_HEIGHT,
+  SECTION_ORDER,
+  DealSectionType,
+} from "../constants";
 
-type SectionType = "topDeals" | "megaDeals" | "popular" | "storeDeals";
-
-const getSectionIcon = (type: SectionType) => {
-  switch (type) {
-    case "topDeals":
-      return TrendingUp;
-    case "megaDeals":
-      return Zap;
-    case "popular":
-      return Star;
-    case "storeDeals":
-      return Store;
-    default:
-      return Package;
-  }
-};
+const isValidSectionType = (value: string | null): value is DealSectionType =>
+  !!value && (SECTION_ORDER as string[]).includes(value);
 
 export default function FullListScreen() {
-  const { products: popularProducts } = usePopularProducts({ first: 50 });
+  const { products: popularProducts } = usePopularProducts({
+    first: DEFAULT_PRODUCTS_FETCH_COUNT,
+  });
   const navigate = useNavigateWithTransition();
   const location = useLocation();
   const searchParams = useMemo(
@@ -40,7 +37,9 @@ export default function FullListScreen() {
     [location.search]
   );
 
-  const type = (searchParams.get("type") ?? "topDeals") as SectionType;
+  const type = isValidSectionType(searchParams.get("type"))
+    ? (searchParams.get("type") as DealSectionType)
+    : DEFAULT_SECTION_TYPE;
   const storeFromParams = searchParams.get("store");
 
   const productPool = useMemo(() => popularProducts ?? [], [popularProducts]);
@@ -68,34 +67,59 @@ export default function FullListScreen() {
     }
   }, [productPool, storeWise, storeFromParams, type]);
 
-  const sectionTitleMap: Record<SectionType, string> = {
-    topDeals: "All Top Deals",
-    megaDeals: "All Mega Deals",
-    popular: "All Popular Picks",
-    storeDeals: storeFromParams
+  const sectionTitle =
+    type === "storeDeals" && storeFromParams
       ? `${storeFromParams} Deals`
-      : "Store-wise Deals",
-  };
+      : DEAL_SECTION_META[type].title;
 
-  const Icon = getSectionIcon(type);
+  const subtitle =
+    type === "storeDeals" && storeFromParams
+      ? `Best of ${storeFromParams}`
+      : DEAL_SECTION_META[type].subtitle;
+
+  const Icon = DEAL_SECTION_ICON_MAP[type];
+
+  const productRows = useMemo(() => {
+    const rows: typeof derivedProducts[] = [];
+
+    for (let i = 0; i < derivedProducts.length; i += 2) {
+      rows.push(derivedProducts.slice(i, i + 2));
+    }
+
+    return rows;
+  }, [derivedProducts]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-[#CCCCFF]/10 via-white to-white">
       {/* Header Section with Gradient */}
-      <div className="bg-gradient-to-br from-[#CCCCFF] via-[#A3A3CC] to-[#5C5C99] pt-6 pb-6 px-4 rounded-b-3xl shadow-lg">
-        <button
-          className="mb-4 p-2.5 rounded-xl bg-white/20 backdrop-blur-sm border border-white/30 hover:bg-white/30 transition-all duration-200"
-          onClick={() => navigate(-1)}
-        >
-          <ArrowLeft className="w-5 h-5 text-white" strokeWidth={2.5} />
-        </button>
-        <div className="flex items-center gap-3">
-          <div className="p-2.5 rounded-xl bg-white/30 backdrop-blur-sm border border-white/40">
+      <div className="bg-gradient-to-br from-[#CCCCFF] via-[#A3A3CC] to-[#5C5C99] pt-6 pb-8 px-4 rounded-b-3xl shadow-lg">
+        <div className="flex items-center justify-between">
+          <button
+            className="p-2.5 rounded-xl bg-white/15 backdrop-blur-sm border border-white/30 hover:bg-white/25 transition-all duration-200 flex items-center gap-2 text-white font-semibold"
+            onClick={() => navigate(-1)}
+          >
+            <ArrowLeft className="w-5 h-5" strokeWidth={2.5} />
+            Back
+          </button>
+          <span className="px-3 py-1 rounded-full bg-white/15 text-xs font-semibold text-white tracking-wide border border-white/30">
+            DealSpot
+          </span>
+        </div>
+        <div className="mt-4 flex items-center gap-4 rounded-3xl bg-white/15 border border-white/30 px-4 py-3 backdrop-blur-sm shadow-lg">
+          <div className="p-3 rounded-2xl bg-white/25 border border-white/40">
             <Icon className="w-6 h-6 text-white" strokeWidth={2.5} />
           </div>
-          <h2 className="text-2xl font-bold text-white drop-shadow-md">
-            {sectionTitleMap[type] ?? "Deals"}
-          </h2>
+          <div>
+            <p className="text-sm text-white/80 uppercase tracking-[0.2em] font-semibold">
+              Curated list
+            </p>
+            <h2 className="text-2xl font-bold text-white leading-tight">
+              {sectionTitle}
+            </h2>
+            <p className="text-sm text-white/90 font-medium mt-1">
+              {subtitle}
+            </p>
+          </div>
         </div>
       </div>
 
@@ -109,13 +133,20 @@ export default function FullListScreen() {
           </div>
         ) : (
           <List
-            items={derivedProducts}
+            items={productRows}
             horizontalDirection={false}
             showScrollbar={false}
-            height={600}
-            renderItem={(product) => (
-              <div className="mb-4 rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300">
-                <ProductCard  product={product} />
+            height={FULL_LIST_LIST_HEIGHT}
+            renderItem={(row) => (
+              <div className="grid grid-cols-2 gap-4 mb-4">
+                {row.map((product) => (
+                  <div
+                    key={product.id}
+                    className="rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300"
+                  >
+                    <ProductCard product={product} />
+                  </div>
+                ))}
               </div>
             )}
           />
