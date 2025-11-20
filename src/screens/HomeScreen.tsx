@@ -2,7 +2,6 @@ import {
   useNavigateWithTransition,
   usePopularProducts,
 } from "@shopify/shop-minis-react";
-import { Flame, Star, Store, TrendingUp } from "lucide-react";
 import { useMemo } from "react";
 import Header from "../components/Header";
 import SectionScroller from "../components/SectionScroller";
@@ -12,11 +11,20 @@ import {
   getStoreWiseDeals,
   getTopDeals,
 } from "../utils/productUtils";
+import {
+  DEFAULT_PRODUCTS_FETCH_COUNT,
+  DEAL_SECTION_META,
+  FEATURED_STORE_FALLBACK_NAME,
+  POPULAR_PRODUCTS_FETCH_POLICY,
+  QUICK_ACTION_CONFIG,
+  SECTION_ORDER,
+  DealSectionType,
+} from "../constants";
 
 export default function HomeScreen() {
   const { products: popularProducts } = usePopularProducts({
-    first:50,
-    fetchPolicy: "cache-first",
+    first: DEFAULT_PRODUCTS_FETCH_COUNT,
+    fetchPolicy: POPULAR_PRODUCTS_FETCH_POLICY,
   });
   const navigate = useNavigateWithTransition();
 
@@ -41,80 +49,61 @@ export default function HomeScreen() {
       return storeNames[0];
     }
 
-    return "Mock Shop";
+    return FEATURED_STORE_FALLBACK_NAME;
   }, [storeWiseDeals]);
 
   const featuredStoreDeals =
     storeWiseDeals[featuredStoreName]?.slice(0, 5) ?? [];
 
-  const quickActions = [
-    {
-      key: "quick-top-deals",
-      label: "Top Deals",
-      copy: "Up to 60% off",
-      icon: TrendingUp,
-      target: "/full-list?type=topDeals",
-    },
-    {
-      key: "quick-mega-deals",
-      label: "Mega Drops",
-      copy: "50%+ savings",
-      icon: Flame,
-      target: "/full-list?type=megaDeals",
-    },
-    {
-      key: "quick-popular",
-      label: "Popular Picks",
-      copy: "Loved by shoppers",
-      icon: Star,
-      target: "/full-list?type=popular",
-    },
-    {
-      key: "quick-store",
-      label: `${featuredStoreName} Picks`,
-      copy: "Store spotlight",
-      icon: Store,
-      target: `/full-list?type=storeDeals&store=${encodeURIComponent(
-        featuredStoreName
-      )}`,
-    },
-  ];
-
-  const sectionConfigs = [
-    {
-      key: "top-deals",
-      title: "Top Deals",
-      subtitle: "Hand-picked price drops you can’t miss",
-      products: topDeals,
-      onShopAll: () => navigate("/full-list?type=topDeals"),
-    },
-    {
-      key: "mega-deals",
-      title: "Mega Deals",
-      subtitle: "50% off and beyond",
-      products: megaDeals,
-      onShopAll: () => navigate("/full-list?type=megaDeals"),
-    },
-    {
-      key: "popular-products",
-      title: "Popular Picks",
-      subtitle: "Loved by thousands of shoppers",
-      products: popular,
-      onShopAll: () => navigate("/full-list?type=popular"),
-    },
-    {
-      key: "store-deals",
-      title: "Store-wise Deals",
-      subtitle: featuredStoreName,
-      products: featuredStoreDeals,
-      onShopAll: () =>
-        navigate(
-          `/full-list?type=storeDeals&store=${encodeURIComponent(
+  const quickActions = QUICK_ACTION_CONFIG.map((action) => {
+    const destination =
+      action.type === "storeDeals"
+        ? `/full-list?type=storeDeals&store=${encodeURIComponent(
             featuredStoreName
           )}`
+        : `/full-list?type=${action.type}`;
+
+    const resolvedLabel =
+      action.type === "storeDeals"
+        ? `${featuredStoreName} Picks`
+        : action.label;
+
+    return {
+      key: action.key,
+      label: resolvedLabel,
+      copy: action.copy,
+      icon: action.icon,
+      target: destination,
+    };
+  });
+
+  const sectionProductMap: Record<DealSectionType, typeof topDeals> = {
+    topDeals,
+    megaDeals,
+    popular,
+    storeDeals: featuredStoreDeals,
+  };
+
+  const sectionConfigs = SECTION_ORDER.map((sectionType) => {
+    const meta = DEAL_SECTION_META[sectionType];
+
+    return {
+      key: sectionType,
+      sectionType,
+      title: meta.title,
+      subtitle:
+        sectionType === "storeDeals" ? featuredStoreName : meta.subtitle,
+      products: sectionProductMap[sectionType],
+      onShopAll: () =>
+        navigate(
+          sectionType === "storeDeals"
+            ? `/full-list?type=storeDeals&store=${encodeURIComponent(
+                featuredStoreName
+              )}`
+            : `/full-list?type=${sectionType}`
         ),
-    },
-  ];
+    };
+  });
 
   return (
     <div className="flex min-h-screen flex-col bg-gradient-to-b from-[#CCCCFF]/5 via-white to-white px-4 pb-10 pt-6">
@@ -149,6 +138,7 @@ export default function HomeScreen() {
           <SectionScroller
             key={section.key}
             title={section.title}
+            sectionType={section.sectionType}
             subtitle={section.subtitle}
             products={section.products}
             onShopAll={section.onShopAll}

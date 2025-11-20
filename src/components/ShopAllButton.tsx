@@ -1,5 +1,6 @@
 import { Button } from "@shopify/shop-minis-react";
 import { ArrowRight } from "lucide-react";
+import { SHOP_ALL_BUTTON_CLASSNAME } from "../constants";
 
 interface ShopAllButtonProps {
   onClick: () => void;
@@ -12,7 +13,7 @@ export default function ShopAllButton({
 }: ShopAllButtonProps) {
   return (
     <Button
-      className="w-full rounded-2xl py-3.5 text-sm font-bold bg-gradient-to-r from-[#5C5C99] to-[#292966] text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0"
+      className={SHOP_ALL_BUTTON_CLASSNAME}
       variant="secondary"
       onClick={onClick}
     >

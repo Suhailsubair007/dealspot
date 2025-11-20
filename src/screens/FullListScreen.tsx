@@ -4,7 +4,7 @@ import {
   useNavigateWithTransition,
   usePopularProducts,
 } from "@shopify/shop-minis-react";
-import { ArrowLeft, TrendingUp, Zap, Star, Store, Package } from "lucide-react";
+import { ArrowLeft, Package } from "lucide-react";
 import { useMemo } from "react";
 import { useLocation } from "react-router";
 import {
@@ -13,26 +13,23 @@ import {
   getStoreWiseDeals,
   getTopDeals,
 } from "../utils/productUtils";
+import {
+  DEAL_SECTION_ICON_MAP,
+  DEAL_SECTION_META,
+  DEFAULT_PRODUCTS_FETCH_COUNT,
+  DEFAULT_SECTION_TYPE,
+  FULL_LIST_LIST_HEIGHT,
+  SECTION_ORDER,
+  DealSectionType,
+} from "../constants";
 
-type SectionType = "topDeals" | "megaDeals" | "popular" | "storeDeals";
-
-const getSectionIcon = (type: SectionType) => {
-  switch (type) {
-    case "topDeals":
-      return TrendingUp;
-    case "megaDeals":
-      return Zap;
-    case "popular":
-      return Star;
-    case "storeDeals":
-      return Store;
-    default:
-      return Package;
-  }
-};
+const isValidSectionType = (value: string | null): value is DealSectionType =>
+  !!value && (SECTION_ORDER as string[]).includes(value);
 
 export default function FullListScreen() {
-  const { products: popularProducts } = usePopularProducts({ first: 50 });
+  const { products: popularProducts } = usePopularProducts({
+    first: DEFAULT_PRODUCTS_FETCH_COUNT,
+  });
   const navigate = useNavigateWithTransition();
   const location = useLocation();
   const searchParams = useMemo(
@@ -40,7 +37,9 @@ export default function FullListScreen() {
     [location.search]
   );
 
-  const type = (searchParams.get("type") ?? "topDeals") as SectionType;
+  const type = isValidSectionType(searchParams.get("type"))
+    ? (searchParams.get("type") as DealSectionType)
+    : DEFAULT_SECTION_TYPE;
   const storeFromParams = searchParams.get("store");
 
   const productPool = useMemo(() => popularProducts ?? [], [popularProducts]);
@@ -68,26 +67,17 @@ export default function FullListScreen() {
     }
   }, [productPool, storeWise, storeFromParams, type]);
 
-  const sectionTitleMap: Record<SectionType, string> = {
-    topDeals: "All Top Deals",
-    megaDeals: "All Mega Deals",
-    popular: "All Popular Picks",
-    storeDeals: storeFromParams
+  const sectionTitle =
+    type === "storeDeals" && storeFromParams
       ? `${storeFromParams} Deals`
-      : "Store-wise Deals",
-  };
+      : DEAL_SECTION_META[type].title;
 
-  const sectionSubtitleMap: Record<SectionType, string> = {
-    topDeals: "Hand-picked price drops you can’t miss",
-    megaDeals: "50% off and beyond",
-    popular: "Loved by thousands of shoppers",
-    storeDeals: storeFromParams
+  const subtitle =
+    type === "storeDeals" && storeFromParams
       ? `Best of ${storeFromParams}`
-      : "Curated store highlights",
-  };
+      : DEAL_SECTION_META[type].subtitle;
 
-  const Icon = getSectionIcon(type);
-  const subtitle = sectionSubtitleMap[type];
+  const Icon = DEAL_SECTION_ICON_MAP[type];
 
   const productRows = useMemo(() => {
     const rows: typeof derivedProducts[] = [];
@@ -124,7 +114,7 @@ export default function FullListScreen() {
               Curated list
             </p>
             <h2 className="text-2xl font-bold text-white leading-tight">
-              {sectionTitleMap[type] ?? "Deals"}
+              {sectionTitle}
             </h2>
             <p className="text-sm text-white/90 font-medium mt-1">
               {subtitle}
@@ -146,7 +136,7 @@ export default function FullListScreen() {
             items={productRows}
             horizontalDirection={false}
             showScrollbar={false}
-            height={600}
+            height={FULL_LIST_LIST_HEIGHT}
             renderItem={(row) => (
               <div className="grid grid-cols-2 gap-4 mb-4">
                 {row.map((product) => (

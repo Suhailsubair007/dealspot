@@ -1,6 +1,5 @@
-import type { Product } from '@shopify/shop-minis-react';
-
-const MAX_ITEMS = 5;
+import type { Product } from "@shopify/shop-minis-react";
+import { PRODUCT_SECTION_ITEM_LIMIT } from "../constants";
 
 export const isDiscounted = (product: Product): boolean => {
   if (!product.compareAtPrice) {
@@ -36,17 +35,20 @@ const sortByDiscountDesc = (a: Product, b: Product): number =>
   discountPercent(b) - discountPercent(a);
 
 export const getTopDeals = (products: Product[]): Product[] =>
-  products.filter(isDiscounted).sort(sortByDiscountDesc).slice(0, MAX_ITEMS);
+  products
+    .filter(isDiscounted)
+    .sort(sortByDiscountDesc)
+    .slice(0, PRODUCT_SECTION_ITEM_LIMIT);
 
 export const getMegaDeals = (products: Product[]): Product[] =>
   products
-    .filter(product => discountPercent(product) >= 40)
+    .filter((product) => discountPercent(product) >= 40)
     .sort(sortByDiscountDesc)
-    .slice(0, MAX_ITEMS);
+    .slice(0, PRODUCT_SECTION_ITEM_LIMIT);
 
 export const getPopularProducts = (products: Product[]): Product[] =>
   products
-    .filter(product => getRating(product) >= 4)
+    .filter((product) => getRating(product) >= 4)
     .sort((a, b) => {
       const ratingDifference = getRating(b) - getRating(a);
 
@@ -56,17 +58,17 @@ export const getPopularProducts = (products: Product[]): Product[] =>
 
       return getReviewCount(b) - getReviewCount(a);
     })
-    .slice(0, MAX_ITEMS);
+    .slice(0, PRODUCT_SECTION_ITEM_LIMIT);
 
 export const getStoreWiseDeals = (
-  products: Product[],
+  products: Product[]
 ): Record<string, Product[]> =>
   products.reduce<Record<string, Product[]>>((acc, product) => {
     if (!isDiscounted(product)) {
       return acc;
     }
 
-    const shopName = product.shop?.name ?? 'Unknown Shop';
+    const shopName = product.shop?.name ?? "Unknown Shop";
 
     if (!acc[shopName]) {
       acc[shopName] = [];

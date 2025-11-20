@@ -1,37 +1,42 @@
 import { Card, ProductCard } from "@shopify/shop-minis-react";
 import type { Product } from "@shopify/shop-minis-react";
-import {
-  TrendingUp,
-  Zap,
-  Star,
-  Store,
-  Package,
-} from "lucide-react";
+import { Package } from "lucide-react";
 import { useEffect, useMemo } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import Autoplay from "embla-carousel-autoplay";
 import ShopAllButton from "./ShopAllButton";
+import {
+  DEAL_SECTION_ICON_MAP,
+  DealSectionType,
+  SECTION_CAROUSEL_AUTOPLAY_DELAY,
+  SECTION_LOOP_THRESHOLD,
+} from "../constants";
 
 interface SectionScrollerProps {
   title: string;
   products: Product[];
   onShopAll: () => void;
   subtitle?: string;
+  sectionType?: DealSectionType;
 }
 
-const getSectionIcon = (title: string) => {
+const getSectionIcon = (title: string, sectionType?: DealSectionType) => {
+  if (sectionType) {
+    return DEAL_SECTION_ICON_MAP[sectionType];
+  }
+
   const titleLower = title.toLowerCase();
   if (titleLower.includes("top") || titleLower.includes("deal")) {
-    return TrendingUp;
+    return DEAL_SECTION_ICON_MAP.topDeals;
   }
   if (titleLower.includes("mega")) {
-    return Zap;
+    return DEAL_SECTION_ICON_MAP.megaDeals;
   }
   if (titleLower.includes("popular") || titleLower.includes("pick")) {
-    return Star;
+    return DEAL_SECTION_ICON_MAP.popular;
   }
   if (titleLower.includes("store")) {
-    return Store;
+    return DEAL_SECTION_ICON_MAP.storeDeals;
   }
   return Package;
 };
@@ -41,10 +46,11 @@ export default function SectionScroller({
   subtitle,
   products,
   onShopAll,
+  sectionType,
 }: SectionScrollerProps) {
   const hasProducts = products.length > 0;
-  const Icon = getSectionIcon(title);
-  const loopCarousel = products.length > 3;
+  const Icon = getSectionIcon(title, sectionType);
+  const loopCarousel = products.length > SECTION_LOOP_THRESHOLD;
 
   const shimmeredProducts = useMemo(() => {
     if (!loopCarousel) {
@@ -65,7 +71,7 @@ export default function SectionScroller({
     },
     [
       Autoplay({
-        delay: 4200,
+        delay: SECTION_CAROUSEL_AUTOPLAY_DELAY,
         stopOnInteraction: false,
         stopOnMouseEnter: true,
         stopOnLastSnap: false,

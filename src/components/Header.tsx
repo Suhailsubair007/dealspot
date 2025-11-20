@@ -1,13 +1,8 @@
 import { Card } from "@shopify/shop-minis-react";
 import { Sparkles, ShoppingBag } from "lucide-react";
+import { HEADER_VIBE_TAGS } from "../constants";
 
 export default function Header() {
-  const vibeTags = [
-    "Exclusive drops",
-    "Limited stock",
-    "Price drops",
-    "Editors' picks",
-  ];
   return (
     <Card className="mb-6 relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#CCCCFF] via-[#A3A3CC] to-[#5C5C99] px-5 py-6 text-white shadow-xl border-0">
       {/* Decorative background pattern */}
@@ -37,7 +32,7 @@ export default function Header() {
           Top Deals, Mega Discounts &amp; Popular Picks — all in one place.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
-          {vibeTags.map((tag) => (
+          {HEADER_VIBE_TAGS.map((tag) => (
             <span
               key={tag}
               className="px-3 py-1 rounded-full bg-white/20 text-xs font-semibold tracking-wide border border-white/30"
