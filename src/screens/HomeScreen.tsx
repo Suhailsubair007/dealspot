@@ -14,8 +14,8 @@ import {
 
 export default function HomeScreen() {
   const { products: popularProducts } = usePopularProducts({
-    first: 20,
-    fetchPolicy: "network-only",
+    first:50,
+    fetchPolicy: "cache-first",
   });
   const navigate = useNavigateWithTransition();
 
@@ -83,10 +83,10 @@ export default function HomeScreen() {
   ];
 
   return (
-    <div className="flex min-h-screen flex-col bg-white px-4 pb-10 pt-6">
+    <div className="flex min-h-screen flex-col bg-gradient-to-b from-[#CCCCFF]/5 via-white to-white px-4 pb-10 pt-6">
       <Header />
 
-      <div className="space-y-6">
+      <div className="space-y-6 mt-2">
         {sectionConfigs.map((section) => (
           <SectionScroller
             key={section.key}
