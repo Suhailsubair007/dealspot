@@ -1,10 +1,9 @@
-import { Card } from "@shopify/shop-minis-react";
 import { Sparkles, ShoppingBag } from "lucide-react";
 import { HEADER_VIBE_TAGS } from "../constants";
 
 export default function Header() {
   return (
-    <Card className="mb-6 relative overflow-hidden rounded-3xl bg-gradient-to-br from-[#CCCCFF] via-[#A3A3CC] to-[#5C5C99] px-5 py-6 text-white shadow-xl border-0">
+    <div className="mb-6 relative overflow-hidden rounded-b-3xl bg-gradient-to-br from-[#3E5879] via-[#213555] to-[#3E5879] pt-6 pb-8 px-4 text-white shadow-lg">
       {/* Decorative background pattern */}
       <div className="absolute inset-0 opacity-10">
         <div className="absolute top-0 right-0 w-32 h-32 bg-white rounded-full blur-3xl" />
@@ -42,6 +41,6 @@ export default function Header() {
           ))}
         </div>
       </div>
-    </Card>
+    </div>
   );
 }

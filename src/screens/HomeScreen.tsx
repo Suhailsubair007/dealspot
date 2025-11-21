@@ -22,16 +22,14 @@ import {
 } from "../constants";
 
 export default function HomeScreen() {
-  const { products: popularProducts } = usePopularProducts({
-    first: DEFAULT_PRODUCTS_FETCH_COUNT,
-    fetchPolicy: POPULAR_PRODUCTS_FETCH_POLICY,
-  });
+  const { products: popularProducts, loading: popularProductsLoading } =
+    usePopularProducts({
+      first: DEFAULT_PRODUCTS_FETCH_COUNT,
+      fetchPolicy: POPULAR_PRODUCTS_FETCH_POLICY,
+    });
   const navigate = useNavigateWithTransition();
 
-  const productPool = useMemo(
-    () => popularProducts ?? [],
-    [popularProducts]
-  );
+  const productPool = useMemo(() => popularProducts ?? [], [popularProducts]);
 
   const topDeals = useMemo(() => getTopDeals(productPool), [productPool]);
   const megaDeals = useMemo(() => getMegaDeals(productPool), [productPool]);
@@ -106,18 +104,18 @@ export default function HomeScreen() {
   });
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-b from-[#CCCCFF]/5 via-white to-white px-4 pb-10 pt-6">
+    <div className="flex min-h-screen flex-col bg-gradient-to-b from-[#F5EFE7]/5 via-white to-white pb-10">
       <Header />
-      <div className="mt-5 grid grid-cols-2 gap-3">
+      <div className="mt-5 grid grid-cols-2 gap-3 px-4">
         {quickActions.map((action) => {
           const Icon = action.icon;
           return (
             <button
               key={action.key}
-              className="flex flex-col items-start gap-2 rounded-2xl border-2 border-[#CCCCFF]/40 bg-white/70 px-4 py-3 text-left shadow-sm hover:shadow-lg transition-all duration-300"
+              className="flex flex-col items-start gap-2 rounded-2xl border-2 border-[#F5EFE7]/40 bg-white/70 px-4 py-3 text-left shadow-sm hover:shadow-lg transition-all duration-300"
               onClick={() => navigate(action.target)}
             >
-              <div className="p-2 rounded-xl bg-gradient-to-br from-[#CCCCFF] to-[#A3A3CC] text-[#292966] shadow-md">
+              <div className="p-2 rounded-xl bg-gradient-to-br from-[#F5EFE7] to-[#D8C4B6] text-[#213555] shadow-md">
                 <Icon className="w-5 h-5" strokeWidth={2.5} />
               </div>
               <div>
@@ -133,9 +131,10 @@ export default function HomeScreen() {
         })}
       </div>
 
-      <div className="space-y-6 mt-6">
+      <div className="space-y-6 mt-6 px-4">
         {sectionConfigs.map((section) => (
           <SectionScroller
+            isLoading={popularProductsLoading}
             key={section.key}
             title={section.title}
             sectionType={section.sectionType}
