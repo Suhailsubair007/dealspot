@@ -1,4 +1,4 @@
-import { Card, ProductCard } from "@shopify/shop-minis-react";
+import { Card, ProductCard, Skeleton } from "@shopify/shop-minis-react";
 import type { Product } from "@shopify/shop-minis-react";
 import { Package } from "lucide-react";
 import { useEffect, useMemo } from "react";
@@ -18,6 +18,7 @@ interface SectionScrollerProps {
   onShopAll: () => void;
   subtitle?: string;
   sectionType?: DealSectionType;
+  isLoading?: boolean;
 }
 
 const getSectionIcon = (title: string, sectionType?: DealSectionType) => {
@@ -47,6 +48,7 @@ export default function SectionScroller({
   products,
   onShopAll,
   sectionType,
+  isLoading = false,
 }: SectionScrollerProps) {
   const hasProducts = products.length > 0;
   const Icon = getSectionIcon(title, sectionType);
@@ -91,8 +93,8 @@ export default function SectionScroller({
   return (
     <section className="mb-6">
       <div className="flex items-center gap-3 mb-3">
-        <div className="p-2 rounded-xl bg-gradient-to-br from-[#CCCCFF] to-[#A3A3CC] shadow-md">
-          <Icon className="w-5 h-5 text-[#292966]" strokeWidth={2.5} />
+        <div className="p-2 rounded-xl bg-gradient-to-br from-[#F5EFE7] to-[#D8C4B6] shadow-md">
+          <Icon className="w-5 h-5 text-[#213555]" strokeWidth={2.5} />
         </div>
         <div className="flex flex-col gap-0.5 flex-1">
           <h2 className="text-lg font-bold text-gray-900">{title}</h2>
@@ -102,11 +104,29 @@ export default function SectionScroller({
         </div>
       </div>
 
-      <Card className="mt-2 rounded-3xl border-2 border-[#CCCCFF]/30 bg-gradient-to-br from-white to-[#CCCCFF]/10 px-3 py-5 shadow-xl backdrop-blur-md relative overflow-hidden">
-        {hasProducts ? (
+      <Card className="mt-2 rounded-3xl border-2 border-[#F5EFE7]/30 bg-gradient-to-br from-white to-[#F5EFE7]/10 px-3 py-5 shadow-xl backdrop-blur-md relative overflow-hidden">
+        {isLoading ? (
+          <div className="flex gap-4 px-1 overflow-x-auto">
+            {[...Array(4)].map((_, index) => (
+              <div
+                key={`skeleton-${index}`}
+                className="flex-[0_0_70%] min-w-0 rounded-3xl overflow-hidden shadow-lg"
+              >
+                <div className="flex flex-col bg-white rounded-3xl">
+                  <Skeleton className="w-full aspect-square rounded-t-3xl" />
+                  <div className="space-y-2 px-3 py-3">
+                    <Skeleton className="h-4 w-3/4" />
+                    <Skeleton className="h-3 w-1/2" />
+                    <Skeleton className="h-5 w-2/3 mt-1" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : hasProducts ? (
           <>
             <div ref={emblaRef} className="overflow-hidden">
-              <div className="flex gap-4">
+              <div className="flex gap-4 px-1">
                 {shimmeredProducts.map((product, index) => (
                   <div
                     key={`${product.id}-${index}`}
@@ -120,7 +140,7 @@ export default function SectionScroller({
           </>
         ) : (
           <div className="flex flex-col items-center justify-center py-10">
-            <Package className="w-12 h-12 text-[#A3A3CC] mb-3" strokeWidth={1.5} />
+            <Package className="w-12 h-12 text-[#D8C4B6] mb-3" strokeWidth={1.5} />
             <p className="text-sm text-gray-500 font-medium">
               Hang tight — we're loading fresh deals.
             </p>

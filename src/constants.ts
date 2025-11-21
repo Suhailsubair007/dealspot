@@ -4,10 +4,10 @@ import { Flame, Star, Store, TrendingUp, Zap } from "lucide-react";
 export type DealSectionType = "topDeals" | "megaDeals" | "popular" | "storeDeals";
 
 export const COLOR_PALETTE = {
-  lightLavender: "#CCCCFF",
-  lavender: "#A3A3CC",
-  indigo: "#5C5C99",
-  midnight: "#292966",
+  lightBeige: "#F5EFE7",
+  beige: "#D8C4B6",
+  mediumBlue: "#3E5879",
+  darkBlue: "#213555",
 };
 
 export const HEADER_VIBE_TAGS = [
@@ -17,7 +17,7 @@ export const HEADER_VIBE_TAGS = [
   "Editors' picks",
 ] as const;
 
-export const DEFAULT_PRODUCTS_FETCH_COUNT = 50;
+export const DEFAULT_PRODUCTS_FETCH_COUNT = 40;
 export const POPULAR_PRODUCTS_FETCH_POLICY = "cache-first";
 
 export const PRODUCT_SECTION_ITEM_LIMIT = 5;
@@ -106,4 +106,4 @@ export const SECTION_ORDER: DealSectionType[] = [
 export const DEFAULT_SECTION_TYPE: DealSectionType = "topDeals";
 
 export const SHOP_ALL_BUTTON_CLASSNAME =
-  "w-full rounded-2xl py-3.5 text-sm font-bold bg-gradient-to-r from-[#5C5C99] to-[#292966] text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0";
+  "w-full rounded-2xl py-3.5 text-sm font-bold bg-gradient-to-r from-[#3E5879] to-[#213555] text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0";

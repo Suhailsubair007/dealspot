@@ -31,7 +31,7 @@ export const getRating = (product: Product): number =>
 export const getReviewCount = (product: Product): number =>
   product.reviewAnalytics?.reviewCount ?? 0;
 
-const sortByDiscountDesc = (a: Product, b: Product): number =>
+export const sortByDiscountDesc = (a: Product, b: Product): number =>
   discountPercent(b) - discountPercent(a);
 
 export const getTopDeals = (products: Product[]): Product[] =>

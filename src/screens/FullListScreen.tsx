@@ -1,17 +1,20 @@
 import {
   List,
   ProductCard,
+  Skeleton,
   useNavigateWithTransition,
   usePopularProducts,
 } from "@shopify/shop-minis-react";
 import { ArrowLeft, Package } from "lucide-react";
-import { useMemo } from "react";
+import { useCallback, useMemo, useRef } from "react";
 import { useLocation } from "react-router";
 import {
-  getMegaDeals,
-  getPopularProducts,
+  discountPercent,
+  getRating,
+  getReviewCount,
   getStoreWiseDeals,
-  getTopDeals,
+  isDiscounted,
+  sortByDiscountDesc,
 } from "../utils/productUtils";
 import {
   DEAL_SECTION_ICON_MAP,
@@ -19,6 +22,7 @@ import {
   DEFAULT_PRODUCTS_FETCH_COUNT,
   DEFAULT_SECTION_TYPE,
   FULL_LIST_LIST_HEIGHT,
+  POPULAR_PRODUCTS_FETCH_POLICY,
   SECTION_ORDER,
   DealSectionType,
 } from "../constants";
@@ -27,8 +31,9 @@ const isValidSectionType = (value: string | null): value is DealSectionType =>
   !!value && (SECTION_ORDER as string[]).includes(value);
 
 export default function FullListScreen() {
-  const { products: popularProducts } = usePopularProducts({
+  const { products: popularProducts, loading, fetchMore } = usePopularProducts({
     first: DEFAULT_PRODUCTS_FETCH_COUNT,
+    fetchPolicy: POPULAR_PRODUCTS_FETCH_POLICY,
   });
   const navigate = useNavigateWithTransition();
   const location = useLocation();
@@ -42,28 +47,70 @@ export default function FullListScreen() {
     : DEFAULT_SECTION_TYPE;
   const storeFromParams = searchParams.get("store");
 
-  const productPool = useMemo(() => popularProducts ?? [], [popularProducts]);
+  // Track if we've had initial data to distinguish initial loading from fetchMore
+  const hasInitialData = useRef(false);
+  if (popularProducts && popularProducts.length > 0) {
+    hasInitialData.current = true;
+  }
+  const isInitialLoading = loading && !hasInitialData.current;
+  const isFetchingMore = loading && hasInitialData.current;
 
-  const storeWise = useMemo(
-    () => getStoreWiseDeals(productPool),
-    [productPool]
-  );
+  // Deduplicate products by ID to prevent duplicates when fetchMore is used
+  // Use stable reference to prevent unnecessary re-renders
+  const productPool = useMemo(() => {
+    if (!popularProducts) return [];
+    
+    const seen = new Set<string>();
+    const deduplicated = popularProducts.filter((product) => {
+      if (seen.has(product.id)) {
+        return false;
+      }
+      seen.add(product.id);
+      return true;
+    });
+    
+    return deduplicated;
+  }, [popularProducts]);
 
+  // Memoize storeWise with stable reference
+  const storeWise = useMemo(() => {
+    if (productPool.length === 0) return {};
+    return getStoreWiseDeals(productPool);
+  }, [productPool]);
+
+  // Memoize derived products with stable reference - only recalculate when dependencies actually change
   const derivedProducts = useMemo(() => {
+    if (productPool.length === 0) return [];
+
     switch (type) {
-      case "megaDeals":
-        return getMegaDeals(productPool);
-      case "popular":
-        return getPopularProducts(productPool);
+      case "megaDeals": {
+        // For full list, show all mega deals, not just limited ones
+        return productPool
+          .filter((product) => discountPercent(product) >= 40)
+          .sort(sortByDiscountDesc);
+      }
+      case "popular": {
+        // For full list, show all popular products, not just limited ones
+        return productPool
+          .filter((product) => getRating(product) >= 4)
+          .sort((a, b) => {
+            const ratingDifference = getRating(b) - getRating(a);
+            if (ratingDifference !== 0) {
+              return ratingDifference;
+            }
+            return getReviewCount(b) - getReviewCount(a);
+          });
+      }
       case "storeDeals":
         if (storeFromParams) {
           return storeWise[storeFromParams] ?? [];
         }
-
-        return Object.values(storeWise).flat().slice(0, 20);
+        return Object.values(storeWise).flat();
       case "topDeals":
-      default:
-        return getTopDeals(productPool);
+      default: {
+        // For full list, show all discounted products, not just limited ones
+        return productPool.filter(isDiscounted).sort(sortByDiscountDesc);
+      }
     }
   }, [productPool, storeWise, storeFromParams, type]);
 
@@ -79,6 +126,7 @@ export default function FullListScreen() {
 
   const Icon = DEAL_SECTION_ICON_MAP[type];
 
+  // Stable product rows - only recalculate when derivedProducts actually changes
   const productRows = useMemo(() => {
     const rows: typeof derivedProducts[] = [];
 
@@ -89,10 +137,32 @@ export default function FullListScreen() {
     return rows;
   }, [derivedProducts]);
 
+  // Memoized render function to prevent List re-renders
+  const renderRow = useCallback(
+    (row: typeof derivedProducts) => (
+      <div className="grid grid-cols-2 gap-4 mb-4">
+        {row.map((product) => (
+          <div
+            key={product.id}
+            className="rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300"
+          >
+            <ProductCard product={product} />
+          </div>
+        ))}
+      </div>
+    ),
+    []
+  );
+
+  // Skeleton loading rows
+  const skeletonRows = useMemo(() => {
+    return Array.from({ length: 6 }, () => [null, null]);
+  }, []);
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#CCCCFF]/10 via-white to-white">
+    <div className="min-h-screen bg-gradient-to-b from-[#F5EFE7]/10 via-white to-white">
       {/* Header Section with Gradient */}
-      <div className="bg-gradient-to-br from-[#CCCCFF] via-[#A3A3CC] to-[#5C5C99] pt-6 pb-8 px-4 rounded-b-3xl shadow-lg">
+      <div className="bg-gradient-to-br from-[#3E5879] via-[#213555] to-[#3E5879] pt-6 pb-8 px-4 rounded-b-3xl shadow-lg">
         <div className="flex items-center justify-between">
           <button
             className="p-2.5 rounded-xl bg-white/15 backdrop-blur-sm border border-white/30 hover:bg-white/25 transition-all duration-200 flex items-center gap-2 text-white font-semibold"
@@ -124,32 +194,68 @@ export default function FullListScreen() {
       </div>
 
       <div className="px-4 pb-6 pt-6">
-        {derivedProducts.length === 0 ? (
+        {isInitialLoading ? (
+          // Initial loading state with skeletons
+          <div className="space-y-4">
+            {skeletonRows.map((row, rowIndex) => (
+              <div key={`skeleton-row-${rowIndex}`} className="grid grid-cols-2 gap-4">
+                {row.map((_, colIndex) => (
+                  <div
+                    key={`skeleton-${rowIndex}-${colIndex}`}
+                    className="rounded-2xl overflow-hidden shadow-md bg-white"
+                  >
+                    <div className="flex flex-col">
+                      <Skeleton className="w-full aspect-square rounded-t-2xl" />
+                      <div className="space-y-2 px-3 py-3">
+                        <Skeleton className="h-4 w-3/4" />
+                        <Skeleton className="h-3 w-1/2" />
+                        <Skeleton className="h-5 w-2/3 mt-1" />
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ))}
+          </div>
+        ) : derivedProducts.length === 0 ? (
+          // Empty state
           <div className="flex flex-col items-center justify-center py-16">
-            <Package className="w-16 h-16 text-[#A3A3CC] mb-4" strokeWidth={1.5} />
+            <Package className="w-16 h-16 text-[#D8C4B6] mb-4" strokeWidth={1.5} />
             <p className="text-base text-gray-600 font-medium text-center">
               We're loading fresh deals for you. Check back in a moment.
             </p>
           </div>
         ) : (
-          <List
-            items={productRows}
-            horizontalDirection={false}
-            showScrollbar={false}
-            height={FULL_LIST_LIST_HEIGHT}
-            renderItem={(row) => (
-              <div className="grid grid-cols-2 gap-4 mb-4">
-                {row.map((product) => (
+          <>
+            <List
+              items={productRows}
+              horizontalDirection={false}
+              showScrollbar={false}
+              fetchMore={fetchMore}
+              height={FULL_LIST_LIST_HEIGHT}
+              renderItem={renderRow}
+            />
+            {/* Show loading skeleton at bottom when fetching more - with smooth transition */}
+            {isFetchingMore && (
+              <div className="grid grid-cols-2 gap-4 mt-4 opacity-100 transition-opacity duration-300">
+                {[null, null].map((_, index) => (
                   <div
-                    key={product.id}
-                    className="rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300"
+                    key={`loading-skeleton-${index}`}
+                    className="rounded-2xl overflow-hidden shadow-md bg-white"
                   >
-                    <ProductCard product={product} />
+                    <div className="flex flex-col">
+                      <Skeleton className="w-full aspect-square rounded-t-2xl" />
+                      <div className="space-y-2 px-3 py-3">
+                        <Skeleton className="h-4 w-3/4" />
+                        <Skeleton className="h-3 w-1/2" />
+                        <Skeleton className="h-5 w-2/3 mt-1" />
+                      </div>
+                    </div>
                   </div>
                 ))}
               </div>
             )}
-          />
+          </>
         )}
       </div>
     </div>
