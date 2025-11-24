@@ -32,7 +32,7 @@ export default function SplashScreen({ onComplete }: SplashScreenProps) {
       clearTimeout(fadeOutTimer);
       clearTimeout(hideTimer);
     };
-  }, [onComplete]);
+  }, []);
 
   if (!isVisible) return null;
 
