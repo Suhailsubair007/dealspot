@@ -82,13 +82,13 @@ export default function SectionScroller({
           <>
             <div className="flex gap-4 px-1 overflow-x-auto snap-x snap-mandatory pb-1">
               {products.map((product) => (
-                <div
+                  <div
                   key={product.id}
                   className="flex-[0_0_70%] min-w-0 rounded-3xl overflow-hidden shadow-lg snap-start"
-                >
-                  <ProductCard product={product} />
-                </div>
-              ))}
+                  >
+                    <ProductCard product={product} />
+                  </div>
+                ))}
             </div>
           </>
         ) : (

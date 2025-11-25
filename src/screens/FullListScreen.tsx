@@ -31,7 +31,11 @@ const isValidSectionType = (value: string | null): value is DealSectionType =>
   !!value && (SECTION_ORDER as string[]).includes(value);
 
 export default function FullListScreen() {
-  const { products: popularProducts, loading, fetchMore } = usePopularProducts({
+  const {
+    products: popularProducts,
+    loading,
+    fetchMore,
+  } = usePopularProducts({
     first: DEFAULT_PRODUCTS_FETCH_COUNT,
     fetchPolicy: POPULAR_PRODUCTS_FETCH_POLICY,
   });
@@ -59,7 +63,7 @@ export default function FullListScreen() {
   // Use stable reference to prevent unnecessary re-renders
   const productPool = useMemo(() => {
     if (!popularProducts) return [];
-    
+
     const seen = new Set<string>();
     const deduplicated = popularProducts.filter((product) => {
       if (seen.has(product.id)) {
@@ -68,7 +72,7 @@ export default function FullListScreen() {
       seen.add(product.id);
       return true;
     });
-    
+
     return deduplicated;
   }, [popularProducts]);
 
@@ -128,7 +132,7 @@ export default function FullListScreen() {
 
   // Stable product rows - only recalculate when derivedProducts actually changes
   const productRows = useMemo(() => {
-    const rows: typeof derivedProducts[] = [];
+    const rows: (typeof derivedProducts)[] = [];
 
     for (let i = 0; i < derivedProducts.length; i += 2) {
       rows.push(derivedProducts.slice(i, i + 2));
@@ -186,9 +190,7 @@ export default function FullListScreen() {
             <h2 className="text-2xl font-bold text-white leading-tight">
               {sectionTitle}
             </h2>
-            <p className="text-sm text-white/90 font-medium mt-1">
-              {subtitle}
-            </p>
+            <p className="text-sm text-white/90 font-medium mt-1">{subtitle}</p>
           </div>
         </div>
       </div>
@@ -198,7 +200,10 @@ export default function FullListScreen() {
           // Initial loading state with skeletons
           <div className="space-y-4">
             {skeletonRows.map((row, rowIndex) => (
-              <div key={`skeleton-row-${rowIndex}`} className="grid grid-cols-2 gap-4">
+              <div
+                key={`skeleton-row-${rowIndex}`}
+                className="grid grid-cols-2 gap-4"
+              >
                 {row.map((_, colIndex) => (
                   <div
                     key={`skeleton-${rowIndex}-${colIndex}`}
@@ -220,7 +225,10 @@ export default function FullListScreen() {
         ) : derivedProducts.length === 0 ? (
           // Empty state
           <div className="flex flex-col items-center justify-center py-16">
-            <Package className="w-16 h-16 text-[#D8C4B6] mb-4" strokeWidth={1.5} />
+            <Package
+              className="w-16 h-16 text-[#D8C4B6] mb-4"
+              strokeWidth={1.5}
+            />
             <p className="text-base text-gray-600 font-medium text-center">
               We're loading fresh deals for you. Check back in a moment.
             </p>
