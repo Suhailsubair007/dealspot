@@ -1,33 +1,36 @@
 import {
+  Button,
   useNavigateWithTransition,
   usePopularProducts,
 } from "@shopify/shop-minis-react";
 import { useMemo } from "react";
+import type { Product } from "@shopify/shop-minis-react";
 import Header from "../components/Header";
 import SectionScroller from "../components/SectionScroller";
 import {
+  discountPercent,
   getMegaDeals,
   getPopularProducts,
   getStoreWiseDeals,
   getTopDeals,
 } from "../utils/productUtils";
 import {
-  DEFAULT_PRODUCTS_FETCH_COUNT,
   DEAL_SECTION_META,
   FEATURED_STORE_FALLBACK_NAME,
-  POPULAR_PRODUCTS_FETCH_POLICY,
   QUICK_ACTION_CONFIG,
   SECTION_ORDER,
   DealSectionType,
+  DEFAULT_PRODUCTS_FETCH_COUNT,
+  POPULAR_PRODUCTS_FETCH_POLICY,
 } from "../constants";
 
 export default function HomeScreen() {
+  const navigate = useNavigateWithTransition();
   const { products: popularProducts, loading: popularProductsLoading } =
     usePopularProducts({
       first: DEFAULT_PRODUCTS_FETCH_COUNT,
       fetchPolicy: POPULAR_PRODUCTS_FETCH_POLICY,
     });
-  const navigate = useNavigateWithTransition();
 
   const productPool = useMemo(() => popularProducts ?? [], [popularProducts]);
 
@@ -40,25 +43,62 @@ export default function HomeScreen() {
     [productPool]
   );
 
-  const featuredStoreName = useMemo(() => {
-    const storeNames = Object.keys(storeWiseDeals);
+  const featuredStoreInfo = useMemo(() => {
+    const entries = Object.entries(storeWiseDeals);
 
-    if (storeNames.length > 0) {
-      return storeNames[0];
+    if (entries.length === 0) {
+      return {
+        name: FEATURED_STORE_FALLBACK_NAME,
+        id: null,
+        deals: [],
+      };
     }
 
-    return FEATURED_STORE_FALLBACK_NAME;
+    const [bestStoreName, bestStoreDeals] = entries.reduce<
+      [string, Product[], number]
+    >(
+      (best, [store, deals]) => {
+        if (deals.length === 0) {
+          return best;
+        }
+
+        const highestDiscount = discountPercent(deals[0]);
+
+        if (highestDiscount > best[2]) {
+          return [store, deals, highestDiscount];
+        }
+
+        return best;
+      },
+      ["", [], -Infinity]
+    );
+
+    // Get store ID from the first product in the best store's deals
+    const storeId = bestStoreDeals[0]?.shop?.id ?? null;
+
+    return {
+      name: bestStoreName || FEATURED_STORE_FALLBACK_NAME,
+      id: storeId,
+      deals: bestStoreDeals.slice(0, 5),
+    };
   }, [storeWiseDeals]);
 
-  const featuredStoreDeals =
-    storeWiseDeals[featuredStoreName]?.slice(0, 5) ?? [];
+  const featuredStoreName = featuredStoreInfo.name;
+  const featuredStoreId = featuredStoreInfo.id;
+  const featuredStoreDeals = featuredStoreInfo.deals;
 
   const quickActions = QUICK_ACTION_CONFIG.map((action) => {
     const destination =
       action.type === "storeDeals"
-        ? `/full-list?type=storeDeals&store=${encodeURIComponent(
-            featuredStoreName
-          )}`
+        ? featuredStoreId
+          ? `/store-deals?storeId=${encodeURIComponent(featuredStoreId)}`
+          : "/store-deals"
+        : action.type === "topDeals"
+        ? "/top-deals"
+        : action.type === "megaDeals"
+        ? "/mega-deals"
+        : action.type === "popular"
+        ? "/popular-picks"
         : `/full-list?type=${action.type}`;
 
     const resolvedLabel =
@@ -85,6 +125,24 @@ export default function HomeScreen() {
   const sectionConfigs = SECTION_ORDER.map((sectionType) => {
     const meta = DEAL_SECTION_META[sectionType];
 
+    const getShopAllPath = () => {
+      if (sectionType === "storeDeals") {
+        return featuredStoreId
+          ? `/store-deals?storeId=${encodeURIComponent(featuredStoreId)}`
+          : "/store-deals";
+      }
+      if (sectionType === "topDeals") {
+        return "/top-deals";
+      }
+      if (sectionType === "megaDeals") {
+        return "/mega-deals";
+      }
+      if (sectionType === "popular") {
+        return "/popular-picks";
+      }
+      return `/full-list?type=${sectionType}`;
+    };
+
     return {
       key: sectionType,
       sectionType,
@@ -92,14 +150,7 @@ export default function HomeScreen() {
       subtitle:
         sectionType === "storeDeals" ? featuredStoreName : meta.subtitle,
       products: sectionProductMap[sectionType],
-      onShopAll: () =>
-        navigate(
-          sectionType === "storeDeals"
-            ? `/full-list?type=storeDeals&store=${encodeURIComponent(
-                featuredStoreName
-              )}`
-            : `/full-list?type=${sectionType}`
-        ),
+      onShopAll: () => navigate(getShopAllPath()),
     };
   });
 
@@ -110,10 +161,11 @@ export default function HomeScreen() {
         {quickActions.map((action) => {
           const Icon = action.icon;
           return (
-            <button
+            <Button
               key={action.key}
-              className="flex flex-col items-start gap-2 rounded-2xl border-2 border-[#F5EFE7]/40 bg-white/70 px-4 py-3 text-left shadow-sm hover:shadow-lg transition-all duration-300"
+              className="flex flex-col items-start gap-2 rounded-2xl border-2 border-[#F5EFE7]/40 bg-white/70 px-4 py-4 text-left shadow-sm active:shadow-lg transition-all duration-300 min-h-[48px] w-full"
               onClick={() => navigate(action.target)}
+              variant="secondary"
             >
               <div className="p-2 rounded-xl bg-gradient-to-br from-[#F5EFE7] to-[#D8C4B6] text-[#213555] shadow-md">
                 <Icon className="w-5 h-5" strokeWidth={2.5} />
@@ -126,7 +178,7 @@ export default function HomeScreen() {
                   {action.copy}
                 </p>
               </div>
-            </button>
+            </Button>
           );
         })}
       </div>

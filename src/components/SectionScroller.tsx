@@ -1,16 +1,9 @@
 import { Card, ProductCard, Skeleton } from "@shopify/shop-minis-react";
 import type { Product } from "@shopify/shop-minis-react";
 import { Package } from "lucide-react";
-import { useEffect, useMemo } from "react";
-import useEmblaCarousel from "embla-carousel-react";
-import Autoplay from "embla-carousel-autoplay";
 import ShopAllButton from "./ShopAllButton";
-import {
-  DEAL_SECTION_ICON_MAP,
-  DealSectionType,
-  SECTION_CAROUSEL_AUTOPLAY_DELAY,
-  SECTION_LOOP_THRESHOLD,
-} from "../constants";
+import { DEAL_SECTION_ICON_MAP, DealSectionType } from "../constants";
+import { discountPercent, isDiscounted } from "../utils/productUtils";
 
 interface SectionScrollerProps {
   title: string;
@@ -52,43 +45,6 @@ export default function SectionScroller({
 }: SectionScrollerProps) {
   const hasProducts = products.length > 0;
   const Icon = getSectionIcon(title, sectionType);
-  const loopCarousel = products.length > SECTION_LOOP_THRESHOLD;
-
-  const shimmeredProducts = useMemo(() => {
-    if (!loopCarousel) {
-      return products;
-    }
-
-    // Duplicate the products to create an endless shimmer effect
-    return [...products, ...products];
-  }, [loopCarousel, products]);
-
-  const [emblaRef, emblaApi] = useEmblaCarousel(
-    {
-      align: "start",
-      loop: loopCarousel,
-      containScroll: "trimSnaps",
-      dragFree: true,
-      skipSnaps: false,
-    },
-    [
-      Autoplay({
-        delay: SECTION_CAROUSEL_AUTOPLAY_DELAY,
-        stopOnInteraction: false,
-        stopOnMouseEnter: true,
-        stopOnLastSnap: false,
-      }),
-    ]
-  );
-
-  useEffect(() => {
-    if (!emblaApi) return;
-
-    return () => {
-      if (!emblaApi) return;
-      emblaApi.destroy();
-    };
-  }, [emblaApi]);
 
   return (
     <section className="mb-6">
@@ -125,17 +81,27 @@ export default function SectionScroller({
           </div>
         ) : hasProducts ? (
           <>
-            <div ref={emblaRef} className="overflow-hidden">
-              <div className="flex gap-4 px-1">
-                {shimmeredProducts.map((product, index) => (
+            <div className="flex gap-4 px-1 overflow-x-auto snap-x snap-mandatory pb-1">
+              {products.map((product) => {
+                const discount = discountPercent(product);
+                const hasDiscount = isDiscounted(product) && discount > 0;
+                
+                return (
                   <div
-                    key={`${product.id}-${index}`}
-                    className="flex-[0_0_70%] min-w-0 rounded-3xl overflow-hidden shadow-lg"
+                    key={product.id}
+                    className="flex-[0_0_70%] min-w-0 rounded-3xl overflow-hidden shadow-lg snap-start relative"
                   >
+                    {hasDiscount && (
+                      <div className="absolute top-2 left-2 z-10 px-2.5 py-1 rounded-lg bg-gradient-to-r from-[#3E5879] to-[#213555] shadow-lg">
+                        <span className="text-xs font-bold text-white">
+                          {Math.round(discount)}% OFF
+                        </span>
+                      </div>
+                    )}
                     <ProductCard product={product} />
                   </div>
-                ))}
-              </div>
+                );
+              })}
             </div>
           </>
         ) : (
