@@ -19,7 +19,8 @@ export default function FullScreenHeader({
     <div className="bg-gradient-to-br from-[#3E5879] via-[#213555] to-[#3E5879] pt-4 pb-4 px-4 rounded-b-2xl shadow-md flex-shrink-0">
       <div className="flex items-center gap-3">
         <button
-          className="p-3 rounded-lg bg-white/10 active:bg-white/20 transition-colors min-h-[48px] min-w-[48px] flex items-center justify-center"
+          aria-label="Go back"
+          className="p-3 rounded-lg bg-white/10 active:bg-white/20 transition-colors min-h-[48px] min-w-[48px] flex items-center justify-center border-0"
           onClick={() => navigate(-1)}
         >
           <ArrowLeft className="w-5 h-5 text-white" strokeWidth={2} />

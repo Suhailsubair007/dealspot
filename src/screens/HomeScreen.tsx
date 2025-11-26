@@ -1,4 +1,8 @@
-import { useNavigateWithTransition } from "@shopify/shop-minis-react";
+import {
+  Button,
+  useNavigateWithTransition,
+  usePopularProducts,
+} from "@shopify/shop-minis-react";
 import { useMemo } from "react";
 import type { Product } from "@shopify/shop-minis-react";
 import Header from "../components/Header";
@@ -16,18 +20,17 @@ import {
   QUICK_ACTION_CONFIG,
   SECTION_ORDER,
   DealSectionType,
+  DEFAULT_PRODUCTS_FETCH_COUNT,
+  POPULAR_PRODUCTS_FETCH_POLICY,
 } from "../constants";
 
-interface HomeScreenProps {
-  popularProducts: Product[] | null | undefined;
-  loading: boolean;
-}
-
-export default function HomeScreen({
-  popularProducts,
-  loading: popularProductsLoading,
-}: HomeScreenProps) {
+export default function HomeScreen() {
   const navigate = useNavigateWithTransition();
+  const { products: popularProducts, loading: popularProductsLoading } =
+    usePopularProducts({
+      first: DEFAULT_PRODUCTS_FETCH_COUNT,
+      fetchPolicy: POPULAR_PRODUCTS_FETCH_POLICY,
+    });
 
   const productPool = useMemo(() => popularProducts ?? [], [popularProducts]);
 
@@ -158,10 +161,11 @@ export default function HomeScreen({
         {quickActions.map((action) => {
           const Icon = action.icon;
           return (
-            <button
+            <Button
               key={action.key}
-              className="flex flex-col items-start gap-2 rounded-2xl border-2 border-[#F5EFE7]/40 bg-white/70 px-4 py-4 text-left shadow-sm active:shadow-lg transition-all duration-300 min-h-[48px]"
+              className="flex flex-col items-start gap-2 rounded-2xl border-2 border-[#F5EFE7]/40 bg-white/70 px-4 py-4 text-left shadow-sm active:shadow-lg transition-all duration-300 min-h-[48px] w-full"
               onClick={() => navigate(action.target)}
+              variant="secondary"
             >
               <div className="p-2 rounded-xl bg-gradient-to-br from-[#F5EFE7] to-[#D8C4B6] text-[#213555] shadow-md">
                 <Icon className="w-5 h-5" strokeWidth={2.5} />
@@ -174,7 +178,7 @@ export default function HomeScreen({
                   {action.copy}
                 </p>
               </div>
-            </button>
+            </Button>
           );
         })}
       </div>
