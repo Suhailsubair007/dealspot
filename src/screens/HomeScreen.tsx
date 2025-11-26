@@ -1,32 +1,32 @@
-import {
-  useNavigateWithTransition,
-  usePopularProducts,
-} from "@shopify/shop-minis-react";
+import { useNavigateWithTransition } from "@shopify/shop-minis-react";
 import { useMemo } from "react";
+import type { Product } from "@shopify/shop-minis-react";
 import Header from "../components/Header";
 import SectionScroller from "../components/SectionScroller";
 import {
+  discountPercent,
   getMegaDeals,
   getPopularProducts,
   getStoreWiseDeals,
   getTopDeals,
 } from "../utils/productUtils";
 import {
-  DEFAULT_PRODUCTS_FETCH_COUNT,
   DEAL_SECTION_META,
   FEATURED_STORE_FALLBACK_NAME,
-  POPULAR_PRODUCTS_FETCH_POLICY,
   QUICK_ACTION_CONFIG,
   SECTION_ORDER,
   DealSectionType,
 } from "../constants";
 
-export default function HomeScreen() {
-  const { products: popularProducts, loading: popularProductsLoading } =
-    usePopularProducts({
-      first: DEFAULT_PRODUCTS_FETCH_COUNT,
-      fetchPolicy: POPULAR_PRODUCTS_FETCH_POLICY,
-    });
+interface HomeScreenProps {
+  popularProducts: Product[] | null | undefined;
+  loading: boolean;
+}
+
+export default function HomeScreen({
+  popularProducts,
+  loading: popularProductsLoading,
+}: HomeScreenProps) {
   const navigate = useNavigateWithTransition();
 
   const productPool = useMemo(() => popularProducts ?? [], [popularProducts]);
@@ -41,13 +41,30 @@ export default function HomeScreen() {
   );
 
   const featuredStoreName = useMemo(() => {
-    const storeNames = Object.keys(storeWiseDeals);
+    const entries = Object.entries(storeWiseDeals);
 
-    if (storeNames.length > 0) {
-      return storeNames[0];
+    if (entries.length === 0) {
+      return FEATURED_STORE_FALLBACK_NAME;
     }
 
-    return FEATURED_STORE_FALLBACK_NAME;
+    const [bestStore] = entries.reduce<[string, number]>(
+      (best, [store, deals]) => {
+        if (deals.length === 0) {
+          return best;
+        }
+
+        const highestDiscount = discountPercent(deals[0]);
+
+        if (highestDiscount > best[1]) {
+          return [store, highestDiscount];
+        }
+
+        return best;
+      },
+      ["", -Infinity]
+    );
+
+    return bestStore || FEATURED_STORE_FALLBACK_NAME;
   }, [storeWiseDeals]);
 
   const featuredStoreDeals =
@@ -112,7 +129,7 @@ export default function HomeScreen() {
           return (
             <button
               key={action.key}
-              className="flex flex-col items-start gap-2 rounded-2xl border-2 border-[#F5EFE7]/40 bg-white/70 px-4 py-3 text-left shadow-sm hover:shadow-lg transition-all duration-300"
+              className="flex flex-col items-start gap-2 rounded-2xl border-2 border-[#F5EFE7]/40 bg-white/70 px-4 py-4 text-left shadow-sm active:shadow-lg transition-all duration-300 min-h-[48px]"
               onClick={() => navigate(action.target)}
             >
               <div className="p-2 rounded-xl bg-gradient-to-br from-[#F5EFE7] to-[#D8C4B6] text-[#213555] shadow-md">

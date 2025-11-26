@@ -3,6 +3,7 @@ import type { Product } from "@shopify/shop-minis-react";
 import { Package } from "lucide-react";
 import ShopAllButton from "./ShopAllButton";
 import { DEAL_SECTION_ICON_MAP, DealSectionType } from "../constants";
+import { discountPercent, isDiscounted } from "../utils/productUtils";
 
 interface SectionScrollerProps {
   title: string;
@@ -81,14 +82,26 @@ export default function SectionScroller({
         ) : hasProducts ? (
           <>
             <div className="flex gap-4 px-1 overflow-x-auto snap-x snap-mandatory pb-1">
-              {products.map((product) => (
+              {products.map((product) => {
+                const discount = discountPercent(product);
+                const hasDiscount = isDiscounted(product) && discount > 0;
+                
+                return (
                   <div
-                  key={product.id}
-                  className="flex-[0_0_70%] min-w-0 rounded-3xl overflow-hidden shadow-lg snap-start"
+                    key={product.id}
+                    className="flex-[0_0_70%] min-w-0 rounded-3xl overflow-hidden shadow-lg snap-start relative"
                   >
+                    {hasDiscount && (
+                      <div className="absolute top-2 left-2 z-10 px-2.5 py-1 rounded-lg bg-gradient-to-r from-[#3E5879] to-[#213555] shadow-lg">
+                        <span className="text-xs font-bold text-white">
+                          {Math.round(discount)}% OFF
+                        </span>
+                      </div>
+                    )}
                     <ProductCard product={product} />
                   </div>
-                ))}
+                );
+              })}
             </div>
           </>
         ) : (

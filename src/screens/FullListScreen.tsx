@@ -3,10 +3,10 @@ import {
   ProductCard,
   Skeleton,
   useNavigateWithTransition,
-  usePopularProducts,
 } from "@shopify/shop-minis-react";
+import type { Product } from "@shopify/shop-minis-react";
 import { ArrowLeft, Package } from "lucide-react";
-import { useCallback, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useLocation } from "react-router";
 import {
   discountPercent,
@@ -19,10 +19,7 @@ import {
 import {
   DEAL_SECTION_ICON_MAP,
   DEAL_SECTION_META,
-  DEFAULT_PRODUCTS_FETCH_COUNT,
   DEFAULT_SECTION_TYPE,
-  FULL_LIST_LIST_HEIGHT,
-  POPULAR_PRODUCTS_FETCH_POLICY,
   SECTION_ORDER,
   DealSectionType,
 } from "../constants";
@@ -30,15 +27,17 @@ import {
 const isValidSectionType = (value: string | null): value is DealSectionType =>
   !!value && (SECTION_ORDER as string[]).includes(value);
 
-export default function FullListScreen() {
-  const {
-    products: popularProducts,
-    loading,
-    fetchMore,
-  } = usePopularProducts({
-    first: DEFAULT_PRODUCTS_FETCH_COUNT,
-    fetchPolicy: POPULAR_PRODUCTS_FETCH_POLICY,
-  });
+interface FullListScreenProps {
+  popularProducts: Product[] | null | undefined;
+  loading: boolean;
+  fetchMore: (() => Promise<void>) | undefined;
+}
+
+export default function FullListScreen({
+  popularProducts,
+  loading,
+  fetchMore,
+}: FullListScreenProps) {
   const navigate = useNavigateWithTransition();
   const location = useLocation();
   const searchParams = useMemo(
@@ -58,6 +57,25 @@ export default function FullListScreen() {
   }
   const isInitialLoading = loading && !hasInitialData.current;
   const isFetchingMore = loading && hasInitialData.current;
+  const [isFetchingMoreVisible, setIsFetchingMoreVisible] = useState(false);
+
+  useEffect(() => {
+    let hideTimeout: ReturnType<typeof setTimeout> | undefined;
+
+    if (isFetchingMore) {
+      if (!isFetchingMoreVisible) {
+        setIsFetchingMoreVisible(true);
+      }
+    } else if (isFetchingMoreVisible) {
+      hideTimeout = setTimeout(() => setIsFetchingMoreVisible(false), 240);
+    }
+
+    return () => {
+      if (hideTimeout) {
+        clearTimeout(hideTimeout);
+      }
+    };
+  }, [isFetchingMore, isFetchingMoreVisible]);
 
   // Deduplicate products by ID to prevent duplicates when fetchMore is used
   // Use stable reference to prevent unnecessary re-renders
@@ -145,14 +163,26 @@ export default function FullListScreen() {
   const renderRow = useCallback(
     (row: typeof derivedProducts) => (
       <div className="grid grid-cols-2 gap-4 mb-4">
-        {row.map((product) => (
-          <div
-            key={product.id}
-            className="rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-shadow duration-300"
-          >
-            <ProductCard product={product} />
-          </div>
-        ))}
+        {row.map((product) => {
+          const discount = discountPercent(product);
+          const hasDiscount = isDiscounted(product) && discount > 0;
+
+          return (
+            <div
+              key={product.id}
+              className="rounded-2xl overflow-hidden shadow-md transition-shadow duration-300 relative"
+            >
+              {hasDiscount && (
+                <div className="absolute top-2 left-2 z-10 px-2.5 py-1 rounded-lg bg-gradient-to-r from-[#3E5879] to-[#213555] shadow-lg">
+                  <span className="text-xs font-bold text-white">
+                    {Math.round(discount)}% OFF
+                  </span>
+                </div>
+              )}
+              <ProductCard product={product} />
+            </div>
+          );
+        })}
       </div>
     ),
     []
@@ -164,38 +194,31 @@ export default function FullListScreen() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#F5EFE7]/10 via-white to-white">
-      {/* Header Section with Gradient */}
-      <div className="bg-gradient-to-br from-[#3E5879] via-[#213555] to-[#3E5879] pt-6 pb-8 px-4 rounded-b-3xl shadow-lg">
-        <div className="flex items-center justify-between">
+    <div className="h-screen flex flex-col bg-gradient-to-b from-[#F5EFE7]/10 via-white to-white overflow-hidden">
+      {/* Simplified Header Section */}
+      <div className="bg-gradient-to-br from-[#3E5879] via-[#213555] to-[#3E5879] pt-4 pb-4 px-4 rounded-b-2xl shadow-md flex-shrink-0">
+        <div className="flex items-center gap-3">
           <button
-            className="p-2.5 rounded-xl bg-white/15 backdrop-blur-sm border border-white/30 hover:bg-white/25 transition-all duration-200 flex items-center gap-2 text-white font-semibold"
+            className="p-3 rounded-lg bg-white/10 active:bg-white/20 transition-colors min-h-[48px] min-w-[48px] flex items-center justify-center"
             onClick={() => navigate(-1)}
           >
-            <ArrowLeft className="w-5 h-5" strokeWidth={2.5} />
-            Back
+            <ArrowLeft className="w-5 h-5 text-white" strokeWidth={2} />
           </button>
-          <span className="px-3 py-1 rounded-full bg-white/15 text-xs font-semibold text-white tracking-wide border border-white/30">
-            DealSpot
-          </span>
-        </div>
-        <div className="mt-4 flex items-center gap-4 rounded-3xl bg-white/15 border border-white/30 px-4 py-3 backdrop-blur-sm shadow-lg">
-          <div className="p-3 rounded-2xl bg-white/25 border border-white/40">
-            <Icon className="w-6 h-6 text-white" strokeWidth={2.5} />
-          </div>
-          <div>
-            <p className="text-sm text-white/80 uppercase tracking-[0.2em] font-semibold">
-              Curated list
-            </p>
-            <h2 className="text-2xl font-bold text-white leading-tight">
-              {sectionTitle}
-            </h2>
-            <p className="text-sm text-white/90 font-medium mt-1">{subtitle}</p>
+          <div className="flex items-center gap-2.5 flex-1">
+            <div className="p-1.5 rounded-lg bg-white/15">
+              <Icon className="w-4 h-4 text-white" strokeWidth={2.5} />
+            </div>
+            <div className="flex-1 min-w-0">
+              <h2 className="text-lg font-bold text-white truncate">
+                {sectionTitle}
+              </h2>
+              <p className="text-xs text-white/80 truncate">{subtitle}</p>
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="px-4 pb-6 pt-6">
+      <div className="flex-1 flex flex-col overflow-hidden px-4 pt-4 pb-4">
         {isInitialLoading ? (
           // Initial loading state with skeletons
           <div className="space-y-4">
@@ -234,18 +257,24 @@ export default function FullListScreen() {
             </p>
           </div>
         ) : (
-          <>
+          <div className="flex-1 flex flex-col overflow-hidden">
             <List
               items={productRows}
               horizontalDirection={false}
               showScrollbar={false}
               fetchMore={fetchMore}
-              height={FULL_LIST_LIST_HEIGHT}
+              height="100%"
               renderItem={renderRow}
             />
             {/* Show loading skeleton at bottom when fetching more - with smooth transition */}
-            {isFetchingMore && (
-              <div className="grid grid-cols-2 gap-4 mt-4 opacity-100 transition-opacity duration-300">
+            {isFetchingMoreVisible && (
+              <div
+                className={`grid grid-cols-2 gap-4 mt-4 px-4 transition-all duration-300 flex-shrink-0 ${
+                  isFetchingMore
+                    ? "opacity-100 translate-y-0"
+                    : "opacity-0 translate-y-2"
+                }`}
+              >
                 {[null, null].map((_, index) => (
                   <div
                     key={`loading-skeleton-${index}`}
@@ -263,7 +292,7 @@ export default function FullListScreen() {
                 ))}
               </div>
             )}
-          </>
+          </div>
         )}
       </div>
     </div>

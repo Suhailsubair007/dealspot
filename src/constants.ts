@@ -106,4 +106,4 @@ export const SECTION_ORDER: DealSectionType[] = [
 export const DEFAULT_SECTION_TYPE: DealSectionType = "topDeals";
 
 export const SHOP_ALL_BUTTON_CLASSNAME =
-  "w-full rounded-2xl py-3.5 text-sm font-bold bg-gradient-to-r from-[#3E5879] to-[#213555] text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0";
+  "w-full rounded-2xl py-3.5 text-sm font-bold bg-gradient-to-r from-[#3E5879] to-[#213555] text-white shadow-lg active:shadow-xl transition-all duration-300 border-0";
