@@ -17,13 +17,11 @@ export const HEADER_VIBE_TAGS = [
   "Editors' picks",
 ] as const;
 
-export const DEFAULT_PRODUCTS_FETCH_COUNT = 40;
+export const DEFAULT_PRODUCTS_FETCH_COUNT = 30;
 export const POPULAR_PRODUCTS_FETCH_POLICY = "cache-first";
 
 export const PRODUCT_SECTION_ITEM_LIMIT = 5;
-export const SECTION_LOOP_THRESHOLD = 3;
-export const SECTION_CAROUSEL_AUTOPLAY_DELAY = 4200;
-export const QUICK_ACTION_AUTOPLAY_DELAY = 2600;
+export const SECTION_LOOP_THRESHOLD = 1;
 export const FULL_LIST_LIST_HEIGHT = 600;
 
 export const FEATURED_STORE_FALLBACK_NAME = "Mock Shop";

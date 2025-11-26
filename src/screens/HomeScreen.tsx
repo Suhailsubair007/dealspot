@@ -40,14 +40,20 @@ export default function HomeScreen({
     [productPool]
   );
 
-  const featuredStoreName = useMemo(() => {
+  const featuredStoreInfo = useMemo(() => {
     const entries = Object.entries(storeWiseDeals);
 
     if (entries.length === 0) {
-      return FEATURED_STORE_FALLBACK_NAME;
+      return {
+        name: FEATURED_STORE_FALLBACK_NAME,
+        id: null,
+        deals: [],
+      };
     }
 
-    const [bestStore] = entries.reduce<[string, number]>(
+    const [bestStoreName, bestStoreDeals] = entries.reduce<
+      [string, Product[], number]
+    >(
       (best, [store, deals]) => {
         if (deals.length === 0) {
           return best;
@@ -55,27 +61,41 @@ export default function HomeScreen({
 
         const highestDiscount = discountPercent(deals[0]);
 
-        if (highestDiscount > best[1]) {
-          return [store, highestDiscount];
+        if (highestDiscount > best[2]) {
+          return [store, deals, highestDiscount];
         }
 
         return best;
       },
-      ["", -Infinity]
+      ["", [], -Infinity]
     );
 
-    return bestStore || FEATURED_STORE_FALLBACK_NAME;
+    // Get store ID from the first product in the best store's deals
+    const storeId = bestStoreDeals[0]?.shop?.id ?? null;
+
+    return {
+      name: bestStoreName || FEATURED_STORE_FALLBACK_NAME,
+      id: storeId,
+      deals: bestStoreDeals.slice(0, 5),
+    };
   }, [storeWiseDeals]);
 
-  const featuredStoreDeals =
-    storeWiseDeals[featuredStoreName]?.slice(0, 5) ?? [];
+  const featuredStoreName = featuredStoreInfo.name;
+  const featuredStoreId = featuredStoreInfo.id;
+  const featuredStoreDeals = featuredStoreInfo.deals;
 
   const quickActions = QUICK_ACTION_CONFIG.map((action) => {
     const destination =
       action.type === "storeDeals"
-        ? `/full-list?type=storeDeals&store=${encodeURIComponent(
-            featuredStoreName
-          )}`
+        ? featuredStoreId
+          ? `/store-deals?storeId=${encodeURIComponent(featuredStoreId)}`
+          : "/store-deals"
+        : action.type === "topDeals"
+        ? "/top-deals"
+        : action.type === "megaDeals"
+        ? "/mega-deals"
+        : action.type === "popular"
+        ? "/popular-picks"
         : `/full-list?type=${action.type}`;
 
     const resolvedLabel =
@@ -102,6 +122,24 @@ export default function HomeScreen({
   const sectionConfigs = SECTION_ORDER.map((sectionType) => {
     const meta = DEAL_SECTION_META[sectionType];
 
+    const getShopAllPath = () => {
+      if (sectionType === "storeDeals") {
+        return featuredStoreId
+          ? `/store-deals?storeId=${encodeURIComponent(featuredStoreId)}`
+          : "/store-deals";
+      }
+      if (sectionType === "topDeals") {
+        return "/top-deals";
+      }
+      if (sectionType === "megaDeals") {
+        return "/mega-deals";
+      }
+      if (sectionType === "popular") {
+        return "/popular-picks";
+      }
+      return `/full-list?type=${sectionType}`;
+    };
+
     return {
       key: sectionType,
       sectionType,
@@ -109,14 +147,7 @@ export default function HomeScreen({
       subtitle:
         sectionType === "storeDeals" ? featuredStoreName : meta.subtitle,
       products: sectionProductMap[sectionType],
-      onShopAll: () =>
-        navigate(
-          sectionType === "storeDeals"
-            ? `/full-list?type=storeDeals&store=${encodeURIComponent(
-                featuredStoreName
-              )}`
-            : `/full-list?type=${sectionType}`
-        ),
+      onShopAll: () => navigate(getShopAllPath()),
     };
   });
 

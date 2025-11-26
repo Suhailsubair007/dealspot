@@ -2,53 +2,37 @@ import {
   List,
   ProductCard,
   Skeleton,
-  useNavigateWithTransition,
+  usePopularProducts,
 } from "@shopify/shop-minis-react";
-import type { Product } from "@shopify/shop-minis-react";
-import { ArrowLeft, Package } from "lucide-react";
+import { Package } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useLocation } from "react-router";
-import {
-  discountPercent,
-  getRating,
-  getReviewCount,
-  getStoreWiseDeals,
-  isDiscounted,
-  sortByDiscountDesc,
-} from "../utils/productUtils";
+import FullScreenHeader from "../components/FullScreenHeader";
 import {
   DEAL_SECTION_ICON_MAP,
   DEAL_SECTION_META,
-  DEFAULT_SECTION_TYPE,
-  SECTION_ORDER,
-  DealSectionType,
+  DEFAULT_PRODUCTS_FETCH_COUNT,
+  POPULAR_PRODUCTS_FETCH_POLICY,
 } from "../constants";
+import {
+  discountPercent,
+  isDiscounted,
+  sortByDiscountDesc,
+} from "../utils/productUtils";
 
-const isValidSectionType = (value: string | null): value is DealSectionType =>
-  !!value && (SECTION_ORDER as string[]).includes(value);
+type PopularProduct = NonNullable<
+  ReturnType<typeof usePopularProducts>["products"]
+>[number];
 
-interface FullListScreenProps {
-  popularProducts: Product[] | null | undefined;
-  loading: boolean;
-  fetchMore: (() => Promise<void>) | undefined;
-}
+type ProductRow = {
+  id: string;
+  products: PopularProduct[];
+};
 
-export default function FullListScreen({
-  popularProducts,
-  loading,
-  fetchMore,
-}: FullListScreenProps) {
-  const navigate = useNavigateWithTransition();
-  const location = useLocation();
-  const searchParams = useMemo(
-    () => new URLSearchParams(location.search),
-    [location.search]
-  );
-
-  const type = isValidSectionType(searchParams.get("type"))
-    ? (searchParams.get("type") as DealSectionType)
-    : DEFAULT_SECTION_TYPE;
-  const storeFromParams = searchParams.get("store");
+export default function TopDealsScreen() {
+  const { products: popularProducts, loading, fetchMore } = usePopularProducts({
+    first: DEFAULT_PRODUCTS_FETCH_COUNT,
+    fetchPolicy: POPULAR_PRODUCTS_FETCH_POLICY,
+  });
 
   // Track if we've had initial data to distinguish initial loading from fetchMore
   const hasInitialData = useRef(false);
@@ -77,8 +61,7 @@ export default function FullListScreen({
     };
   }, [isFetchingMore, isFetchingMoreVisible]);
 
-  // Deduplicate products by ID to prevent duplicates when fetchMore is used
-  // Use stable reference to prevent unnecessary re-renders
+  // Deduplicate products by ID
   const productPool = useMemo(() => {
     if (!popularProducts) return [];
 
@@ -94,76 +77,39 @@ export default function FullListScreen({
     return deduplicated;
   }, [popularProducts]);
 
-  // Memoize storeWise with stable reference
-  const storeWise = useMemo(() => {
-    if (productPool.length === 0) return {};
-    return getStoreWiseDeals(productPool);
+  // Filter and sort top deals
+  const topDeals = useMemo(() => {
+    if (productPool.length === 0) return [];
+    return productPool.filter(isDiscounted).sort(sortByDiscountDesc);
   }, [productPool]);
 
-  // Memoize derived products with stable reference - only recalculate when dependencies actually change
-  const derivedProducts = useMemo(() => {
-    if (productPool.length === 0) return [];
+  const sectionMeta = DEAL_SECTION_META.topDeals;
+  const Icon = DEAL_SECTION_ICON_MAP.topDeals;
 
-    switch (type) {
-      case "megaDeals": {
-        // For full list, show all mega deals, not just limited ones
-        return productPool
-          .filter((product) => discountPercent(product) >= 40)
-          .sort(sortByDiscountDesc);
-      }
-      case "popular": {
-        // For full list, show all popular products, not just limited ones
-        return productPool
-          .filter((product) => getRating(product) >= 4)
-          .sort((a, b) => {
-            const ratingDifference = getRating(b) - getRating(a);
-            if (ratingDifference !== 0) {
-              return ratingDifference;
-            }
-            return getReviewCount(b) - getReviewCount(a);
-          });
-      }
-      case "storeDeals":
-        if (storeFromParams) {
-          return storeWise[storeFromParams] ?? [];
-        }
-        return Object.values(storeWise).flat();
-      case "topDeals":
-      default: {
-        // For full list, show all discounted products, not just limited ones
-        return productPool.filter(isDiscounted).sort(sortByDiscountDesc);
-      }
-    }
-  }, [productPool, storeWise, storeFromParams, type]);
+  // Stable product rows
+  const productRows = useMemo<ProductRow[]>(() => {
+    const rows: ProductRow[] = [];
 
-  const sectionTitle =
-    type === "storeDeals" && storeFromParams
-      ? `${storeFromParams} Deals`
-      : DEAL_SECTION_META[type].title;
+    for (let i = 0; i < topDeals.length; i += 2) {
+      const products = topDeals.slice(i, i + 2);
+      const fallbackId = `row-${i / 2}`;
+      const id =
+        products
+          .map((product) => product?.id)
+          .filter(Boolean)
+          .join("-") || fallbackId;
 
-  const subtitle =
-    type === "storeDeals" && storeFromParams
-      ? `Best of ${storeFromParams}`
-      : DEAL_SECTION_META[type].subtitle;
-
-  const Icon = DEAL_SECTION_ICON_MAP[type];
-
-  // Stable product rows - only recalculate when derivedProducts actually changes
-  const productRows = useMemo(() => {
-    const rows: (typeof derivedProducts)[] = [];
-
-    for (let i = 0; i < derivedProducts.length; i += 2) {
-      rows.push(derivedProducts.slice(i, i + 2));
+      rows.push({ id, products });
     }
 
     return rows;
-  }, [derivedProducts]);
+  }, [topDeals]);
 
-  // Memoized render function to prevent List re-renders
+  // Memoized render function
   const renderRow = useCallback(
-    (row: typeof derivedProducts) => (
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        {row.map((product) => {
+    (row: ProductRow) => (
+      <div key={row.id} className="grid grid-cols-2 gap-4 mb-4">
+        {row.products.map((product) => {
           const discount = discountPercent(product);
           const hasDiscount = isDiscounted(product) && discount > 0;
 
@@ -195,32 +141,14 @@ export default function FullListScreen({
 
   return (
     <div className="h-screen flex flex-col bg-gradient-to-b from-[#F5EFE7]/10 via-white to-white overflow-hidden">
-      {/* Simplified Header Section */}
-      <div className="bg-gradient-to-br from-[#3E5879] via-[#213555] to-[#3E5879] pt-4 pb-4 px-4 rounded-b-2xl shadow-md flex-shrink-0">
-        <div className="flex items-center gap-3">
-          <button
-            className="p-3 rounded-lg bg-white/10 active:bg-white/20 transition-colors min-h-[48px] min-w-[48px] flex items-center justify-center"
-            onClick={() => navigate(-1)}
-          >
-            <ArrowLeft className="w-5 h-5 text-white" strokeWidth={2} />
-          </button>
-          <div className="flex items-center gap-2.5 flex-1">
-            <div className="p-1.5 rounded-lg bg-white/15">
-              <Icon className="w-4 h-4 text-white" strokeWidth={2.5} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <h2 className="text-lg font-bold text-white truncate">
-                {sectionTitle}
-              </h2>
-              <p className="text-xs text-white/80 truncate">{subtitle}</p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <FullScreenHeader
+        title={sectionMeta.title}
+        subtitle={sectionMeta.subtitle}
+        icon={Icon}
+      />
 
       <div className="flex-1 flex flex-col overflow-hidden px-4 pt-4 pb-4">
         {isInitialLoading ? (
-          // Initial loading state with skeletons
           <div className="space-y-4">
             {skeletonRows.map((row, rowIndex) => (
               <div
@@ -245,8 +173,7 @@ export default function FullListScreen({
               </div>
             ))}
           </div>
-        ) : derivedProducts.length === 0 ? (
-          // Empty state
+        ) : topDeals.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16">
             <Package
               className="w-16 h-16 text-[#D8C4B6] mb-4"
@@ -266,7 +193,6 @@ export default function FullListScreen({
               height="100%"
               renderItem={renderRow}
             />
-            {/* Show loading skeleton at bottom when fetching more - with smooth transition */}
             {isFetchingMoreVisible && (
               <div
                 className={`grid grid-cols-2 gap-4 mt-4 px-4 transition-all duration-300 flex-shrink-0 ${
@@ -298,3 +224,4 @@ export default function FullListScreen({
     </div>
   );
 }
+
