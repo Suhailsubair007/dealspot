@@ -85,20 +85,22 @@ export default function SectionScroller({
               {products.map((product) => {
                 const discount = discountPercent(product);
                 const hasDiscount = isDiscounted(product) && discount > 0;
-                
+
                 return (
                   <div
                     key={product.id}
                     className="flex-[0_0_70%] min-w-0 rounded-3xl overflow-hidden shadow-lg snap-start relative"
                   >
                     {hasDiscount && (
-                      <div className="absolute top-2 left-2 z-10 px-2.5 py-1 rounded-lg bg-gradient-to-r from-[#3E5879] to-[#213555] shadow-lg">
+                      <div className="absolute top-4 left-4 z-10 px-2.5 py-1 rounded-lg bg-gradient-to-r from-[#3E5879] to-[#213555] shadow-lg">
                         <span className="text-xs font-bold text-white">
                           {Math.round(discount)}% OFF
                         </span>
                       </div>
                     )}
-                    <ProductCard product={product} />
+                    <div className="p-3">
+                      <ProductCard product={product} />
+                    </div>
                   </div>
                 );
               })}
@@ -106,7 +108,10 @@ export default function SectionScroller({
           </>
         ) : (
           <div className="flex flex-col items-center justify-center py-10">
-            <Package className="w-12 h-12 text-[#D8C4B6] mb-3" strokeWidth={1.5} />
+            <Package
+              className="w-12 h-12 text-[#D8C4B6] mb-3"
+              strokeWidth={1.5}
+            />
             <p className="text-sm text-gray-500 font-medium">
               Hang tight — we're loading fresh deals.
             </p>
