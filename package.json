@@ -6,12 +6,16 @@
   "main": "index.tsx",
   "scripts": {
     "start": "shop-minis dev",
+    "build": "shop-minis build",
+    "build:size": "shop-minis build && echo '' && echo '📦 Bundle Size Check:' && echo '===================' && du -sh .minis-cache/build 2>/dev/null && echo '' && echo '📄 File breakdown:' && find .minis-cache/build -type f -exec ls -lh {} \\; | awk '{printf \"%6s %s\\n\", $5, $9}' | sort -h -r",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "type-check": "tsc --noEmit"
   },
   "devDependencies": {
     "@shopify/shop-minis-cli": "0.0.212",
+    "@tailwindcss/vite": "^4.1.8",
+    "tailwindcss": "^4.1.8",
     "@types/react": "^18.2.43",
     "@types/react-dom": "^18.2.17",
     "@vitejs/plugin-react": "^4.2.1",
