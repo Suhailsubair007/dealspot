@@ -29,11 +29,12 @@ export default function DealProductRow({ row }: DealProductRowProps) {
                 </span>
               </div>
             )}
-            <ProductCard product={product} />
+            <div className="pb-4">
+              <ProductCard variant="default" product={product} />
+            </div>
           </div>
         );
       })}
     </div>
   );
 }
-
