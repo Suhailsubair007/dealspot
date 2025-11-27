@@ -5,502 +5,164 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DealSpot Terms of Service</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            color-scheme: light;
         }
 
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.7;
-            color: #2d3748;
-            background: linear-gradient(to bottom, #F5EFE7 0%, #ffffff 100%);
-            min-height: 100vh;
-            padding-bottom: 60px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            margin: 0;
+            padding: 24px;
+            background: #f6f6f6;
+            color: #1f2933;
         }
 
-        .container {
-            max-width: 900px;
+        main {
+            max-width: 720px;
             margin: 0 auto;
-            padding: 0 20px;
+            background: #fff;
+            border-radius: 16px;
+            padding: 32px;
+            box-shadow: 0 20px 60px rgba(31, 41, 51, 0.08);
         }
 
-        .header {
-            background: linear-gradient(135deg, #3E5879 0%, #213555 50%, #3E5879 100%);
-            color: white;
-            padding: 80px 20px 60px;
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 8px 32px rgba(33, 53, 85, 0.3);
+        header {
+            border-bottom: 1px solid #e4e7eb;
+            padding-bottom: 16px;
+            margin-bottom: 32px;
         }
 
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -10%;
-            width: 400px;
-            height: 400px;
-            background: rgba(255, 255, 255, 0.12);
-            border-radius: 50%;
-            filter: blur(80px);
-            animation: float 20s infinite ease-in-out;
+        h1 {
+            margin: 0 0 8px;
+            font-size: 2rem;
         }
 
-        .header::after {
-            content: '';
-            position: absolute;
-            bottom: -30%;
-            left: -5%;
-            width: 300px;
-            height: 300px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 50%;
-            filter: blur(70px);
-            animation: float 25s infinite ease-in-out reverse;
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) rotate(0deg); }
-            50% { transform: translate(30px, 30px) rotate(180deg); }
-        }
-
-        .header-content {
-            position: relative;
-            z-index: 1;
-        }
-
-        .header h1 {
-            font-size: 3rem;
-            font-weight: 800;
-            margin-bottom: 15px;
-            letter-spacing: -1px;
-            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-            background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.9) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .header .subtitle {
+        h2 {
+            margin-top: 32px;
             font-size: 1.2rem;
-            opacity: 0.95;
-            font-weight: 500;
-            margin-bottom: 10px;
-        }
-
-        .header .brand {
-            font-size: 1.8rem;
-            font-weight: 700;
-            margin-bottom: 25px;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .last-updated {
-            display: inline-block;
-            margin-top: 25px;
-            padding: 12px 28px;
-            background: rgba(255, 255, 255, 0.25);
-            border-radius: 30px;
-            font-size: 0.95rem;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .content {
-            background: white;
-            margin-top: -40px;
-            border-radius: 40px 40px 0 0;
-            box-shadow: 0 -8px 40px rgba(0, 0, 0, 0.1);
-            padding: 60px 50px;
-            position: relative;
-            z-index: 2;
-        }
-
-        @media (max-width: 768px) {
-            .content {
-                padding: 45px 30px;
-                border-radius: 30px 30px 0 0;
-            }
-            
-            .header h1 {
-                font-size: 2.2rem;
-            }
-            
-            .header {
-                padding: 60px 20px 50px;
-            }
-        }
-
-        .section {
-            margin-bottom: 35px;
-            padding: 35px;
-            background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
-            border-radius: 20px;
-            border-left: 5px solid #3E5879;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 2px 12px rgba(62, 88, 121, 0.08);
-        }
-
-        .section::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            background: linear-gradient(90deg, #3E5879, #213555, #3E5879);
-            opacity: 0;
-            transition: opacity 0.4s ease;
-        }
-
-        .section:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 35px rgba(62, 88, 121, 0.15);
-            background: #ffffff;
-            border-left-color: #213555;
-        }
-
-        .section:hover::before {
-            opacity: 1;
-        }
-
-        .section h2 {
-            color: #213555;
-            font-size: 1.6rem;
-            font-weight: 700;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            position: relative;
-        }
-
-        .section h2::before {
-            content: '•';
-            color: #3E5879;
-            font-size: 2.2rem;
-            line-height: 1;
-            font-weight: 900;
-        }
-
-        .section-number {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            background: linear-gradient(135deg, #3E5879, #213555);
-            color: white;
-            border-radius: 8px;
-            font-size: 0.9rem;
-            font-weight: 700;
-            margin-right: 8px;
-        }
-
-        .section p {
-            color: #4a5568;
-            font-size: 1.05rem;
-            margin-bottom: 18px;
-            line-height: 1.8;
+            color: #0f172a;
         }
 
         ul {
-            list-style: none;
-            padding-left: 0;
-            margin: 25px 0;
+            margin: 12px 0 0 18px;
+            padding: 0;
         }
 
-        ul li {
-            padding: 15px 0 15px 40px;
-            position: relative;
-            color: #4a5568;
-            line-height: 1.8;
-            border-bottom: 1px solid #e2e8f0;
-            transition: all 0.3s ease;
+        li {
+            margin-bottom: 8px;
         }
 
-        ul li:last-child {
-            border-bottom: none;
+        p {
+            margin: 12px 0;
         }
 
-        ul li::before {
-            content: '✓';
-            position: absolute;
-            left: 0;
-            top: 15px;
-            color: white;
-            font-weight: bold;
-            font-size: 0.85rem;
-            width: 26px;
-            height: 26px;
-            background: linear-gradient(135deg, #3E5879, #213555);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 8px rgba(62, 88, 121, 0.3);
-        }
-
-        ul li strong {
-            color: #213555;
-            font-weight: 600;
-        }
-
-        .contact-section {
-            background: linear-gradient(135deg, #F5EFE7 0%, #D8C4B6 100%);
-            border-radius: 24px;
-            padding: 45px;
-            text-align: center;
-            margin-top: 50px;
-            border: 2px solid rgba(62, 88, 121, 0.15);
-            box-shadow: 0 8px 25px rgba(33, 53, 85, 0.1);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .contact-section::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -20%;
-            width: 200px;
-            height: 200px;
-            background: rgba(62, 88, 121, 0.05);
-            border-radius: 50%;
-            filter: blur(40px);
-        }
-
-        .contact-section h2 {
-            color: #213555;
-            margin-bottom: 20px;
-            justify-content: center;
-        }
-
-        .contact-section p {
-            color: #2d3748;
-            margin-bottom: 12px;
-            font-size: 1.1rem;
-        }
-
-        .email-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 20px;
-            padding: 16px 40px;
-            background: linear-gradient(135deg, #3E5879 0%, #213555 100%);
-            color: white;
-            text-decoration: none;
-            border-radius: 30px;
-            font-weight: 600;
-            font-size: 1.05rem;
-            transition: all 0.3s ease;
-            box-shadow: 0 6px 20px rgba(62, 88, 121, 0.35);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .email-link::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .email-link:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(62, 88, 121, 0.45);
-        }
-
-        .email-link:hover::before {
-            left: 100%;
-        }
-
-        .footer {
-            text-align: center;
-            padding: 40px 20px;
-            color: #718096;
-            font-size: 0.95rem;
-        }
-
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .section {
-            animation: fadeInUp 0.7s ease-out backwards;
-        }
-
-        .section:nth-child(1) { animation-delay: 0.1s; }
-        .section:nth-child(2) { animation-delay: 0.2s; }
-        .section:nth-child(3) { animation-delay: 0.3s; }
-        .section:nth-child(4) { animation-delay: 0.4s; }
-        .section:nth-child(5) { animation-delay: 0.5s; }
-        .section:nth-child(6) { animation-delay: 0.6s; }
-        .section:nth-child(7) { animation-delay: 0.7s; }
-        .section:nth-child(8) { animation-delay: 0.8s; }
-        .section:nth-child(9) { animation-delay: 0.9s; }
-        .section:nth-child(10) { animation-delay: 1.0s; }
-
-        @media (max-width: 600px) {
-            .section {
-                padding: 25px 20px;
-            }
-            
-            .section h2 {
-                font-size: 1.35rem;
-                flex-wrap: wrap;
-            }
-            
-            .header h1 {
-                font-size: 1.8rem;
-            }
-            
-            .header .brand {
-                font-size: 1.3rem;
-            }
-            
-            .contact-section {
-                padding: 30px 20px;
+        @media (max-width: 640px) {
+            body {
+                padding: 16px;
             }
 
-            .content {
-                padding: 35px 20px;
+            main {
+                padding: 24px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-content">
-            <div class="brand">DealSpot</div>
-            <h1>📘 Terms of Service</h1>
-            <p class="subtitle">Clear expectations for shopping with DealSpot</p>
-            <div class="last-updated">Last Updated: November 27, 2025</div>
-        </div>
-    </div>
+    <main>
+        <header>
+            <h1>DealSpot Terms of Service</h1>
+            <p>Last updated: November 27, 2025</p>
+        </header>
 
-    <div class="container">
-        <div class="content">
-            <div class="section">
-                <h2><span class="section-number">1</span>Acceptance of Terms</h2>
-                <p>
-                    By accessing or using the DealSpot Shop Mini (the "Service"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree, do not access or use the Service.
-                </p>
-            </div>
+        <section>
+            <h2>1. Acceptance</h2>
+            <p>
+                DealSpot is a Shop Mini that runs entirely inside the Shopify Shop app. By opening or using DealSpot you agree to these Terms and to the Shopify Shop app Terms of Service. Do not use DealSpot if you disagree.
+            </p>
+        </section>
 
-            <div class="section">
-                <h2><span class="section-number">2</span>Service Description</h2>
-                <p>
-                    DealSpot provides curated deal discovery and shopping tools within the Shopify Shop app. We connect you with products made available through participating merchants on Shopify.
-                </p>
-            </div>
+        <section>
+            <h2>2. What DealSpot Does</h2>
+            <p>
+                We surface curated deal rows, product bundles, and merchant spotlights using data provided by Shopify and participating stores. All checkout, payments, and fulfillment stay inside Shopify.
+            </p>
+        </section>
 
-            <div class="section">
-                <h2><span class="section-number">3</span>Eligibility</h2>
-                <p>
-                    You must be at least 18 years old or the age of majority in your jurisdiction to use the Service. By using DealSpot, you represent that you meet this requirement and have authority to enter these Terms.
-                </p>
-            </div>
+        <section>
+            <h2>3. Eligibility</h2>
+            <p>
+                You must be able to form a binding contract and meet the eligibility requirements of the Shopify Shop app. If Shopify suspends your Shop account you automatically lose access to DealSpot.
+            </p>
+        </section>
 
-            <div class="section">
-                <h2><span class="section-number">4</span>User Responsibilities</h2>
-                <ul>
-                    <li><strong>Accuracy:</strong> Provide accurate information when interacting with the Service.</li>
-                    <li><strong>Compliance:</strong> Use the Service only for lawful purposes and follow applicable laws.</li>
-                    <li><strong>Security:</strong> Maintain the confidentiality of your Shopify account and notify us of unauthorized use.</li>
-                </ul>
-            </div>
+        <section>
+            <h2>4. Your Responsibilities</h2>
+            <ul>
+                <li>Use DealSpot only for lawful shopping activity.</li>
+                <li>Follow merchant policies for returns, shipping, and support.</li>
+                <li>Keep your Shopify credentials secure—DealSpot never asks for them directly.</li>
+            </ul>
+        </section>
 
-            <div class="section">
-                <h2><span class="section-number">5</span>Purchases & Merchants</h2>
-                <p>
-                    Purchases are processed through Shopify and the participating merchant. DealSpot does not handle payments or fulfill orders. Merchant policies govern shipping, returns, and warranties.
-                </p>
-            </div>
+        <section>
+            <h2>5. Product & Pricing Information</h2>
+            <p>
+                Prices, availability, inventory, and promotions are controlled by merchants and may change without notice. We show the most recent data Shopify provides, but we cannot promise that every listing or badge is error-free.
+            </p>
+        </section>
 
-            <div class="section">
-                <h2><span class="section-number">6</span>Pricing & Availability</h2>
-                <p>
-                    Prices, promotions, and availability can change without notice. We strive for accuracy but do not guarantee that all information is error-free. Merchants are responsible for honoring their offers.
-                </p>
-            </div>
+        <section>
+            <h2>6. Purchases</h2>
+            <p>
+                All payments, order processing, and fulfillment happen through Shopify’s systems. DealSpot never collects payment information and is not the seller of record. Disputes or returns must be handled with the merchant via the Shop app.
+            </p>
+        </section>
 
-            <div class="section">
-                <h2><span class="section-number">7</span>Prohibited Activities</h2>
-                <ul>
-                    <li>Using the Service in a way that interferes with others' use.</li>
-                    <li>Attempting to reverse engineer or disrupt the Service.</li>
-                    <li>Engaging in fraudulent, deceptive, or harmful conduct.</li>
-                </ul>
-            </div>
+        <section>
+            <h2>7. Prohibited Use</h2>
+            <ul>
+                <li>No scraping, reverse engineering, or attempting to bypass Shopify safeguards.</li>
+                <li>No automated use cases that could degrade performance of the Shop app.</li>
+                <li>No fraudulent orders, reviews, or discount abuse.</li>
+            </ul>
+        </section>
 
-            <div class="section">
-                <h2><span class="section-number">8</span>Intellectual Property</h2>
-                <p>
-                    All content in DealSpot, including branding, UI elements, and curated collections, remains the property of DealSpot or its licensors. You may not copy, distribute, or create derivative works without permission.
-                </p>
-            </div>
+        <section>
+            <h2>8. Intellectual Property</h2>
+            <p>
+                The DealSpot name, UI, and curated collections are our property. Product images, marks, and descriptions remain the property of each merchant or Shopify. You may not reuse assets outside the Shop app.
+            </p>
+        </section>
 
-            <div class="section">
-                <h2><span class="section-number">9</span>Disclaimers & Limitation of Liability</h2>
-                <p>
-                    The Service is provided "as is" without warranties of any kind. DealSpot is not liable for direct, indirect, incidental, or consequential damages arising from your use of the Service, except where prohibited by law.
-                </p>
-            </div>
+        <section>
+            <h2>9. Disclaimers & Liability</h2>
+            <p>
+                DealSpot is provided “as is.” We do not guarantee uninterrupted availability, error-free pricing, or specific savings. To the extent permitted by law we are not liable for indirect, incidental, or consequential damages.
+            </p>
+        </section>
 
-            <div class="section">
-                <h2><span class="section-number">10</span>Termination</h2>
-                <p>
-                    We may suspend or terminate access to the Service at any time if you violate these Terms or if continued operation becomes impractical. You may stop using the Service at any time.
-                </p>
-            </div>
+        <section>
+            <h2>10. Suspension or Termination</h2>
+            <p>
+                We can suspend or remove access to DealSpot if you violate these Terms or if Shopify requests it. You may stop using DealSpot at any time by closing the mini.
+            </p>
+        </section>
 
-            <div class="section">
-                <h2><span class="section-number">11</span>Changes to Terms</h2>
-                <p>
-                    We may update these Terms periodically. When we do, we will revise the "Last Updated" date. Continued use of the Service after changes become effective constitutes acceptance of the revised Terms.
-                </p>
-            </div>
+        <section>
+            <h2>11. Changes to These Terms</h2>
+            <p>
+                We may change these Terms to reflect new features or Shopify policies. Updates become effective once posted here. Continuing to use DealSpot means you accept the revised Terms.
+            </p>
+        </section>
 
-            <div class="section">
-                <h2><span class="section-number">12</span>Governing Law</h2>
-                <p>
-                    These Terms are governed by the laws of the Province of Ontario and the laws of Canada applicable therein, without regard to conflict of law principles.
-                </p>
-            </div>
-
-            <div class="contact-section">
-                <h2>Need Help?</h2>
-                <p>If you have any questions about these Terms or the Service, reach out:</p>
-                <a href="mailto:suhail.subair@orgface.com" class="email-link">
-                    ✉️ suhail.subair@orgface.com
-                </a>
-            </div>
-        </div>
-    </div>
-
-    <div class="footer">
-        <p>&copy; 2025 DealSpot. All rights reserved.</p>
-    </div>
+        <section>
+            <h2>12. Getting Help</h2>
+            <p>
+                For questions about DealSpot open the Shop app, navigate to <em>Account → Help & support</em>, and mention this mini. Shopify will route messages to us if something needs our attention.
+            </p>
+        </section>
+    </main>
 </body>
 </html>
 
