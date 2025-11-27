@@ -1,6 +1,11 @@
 {
   "name": "dealspot",
   "permissions": [],
-  "scopes": ["product_list:write", "product_list:read"],
-  "privacy_policy_url": "https://suhailsubair007.github.io/dealspot/privacy.html"
+  "scopes": [
+    "product_list:write",
+    "product_list:read"
+  ],
+  "privacy_policy_url": "https://suhailsubair007.github.io/dealspot/privacy.html",
+  "terms_url": "https://suhailsubair007.github.io/dealspot/terms.html",
+  "handle": "dealspot"
 }
