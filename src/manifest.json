@@ -1,10 +1,8 @@
 {
   "name": "dealspot",
+  "description": "DealSpot curates the best live discounts from multiple Shopify stores, helping users quickly discover high-value deals in one place.",
   "permissions": [],
-  "scopes": [
-    "product_list:write",
-    "product_list:read"
-  ],
+  "scopes": ["product_list:write", "product_list:read"],
   "privacy_policy_url": "https://suhailsubair007.github.io/dealspot/privacy.html",
   "terms_url": "https://suhailsubair007.github.io/dealspot/terms.html",
   "handle": "dealspot"
