@@ -86,7 +86,6 @@ export default function FilterBottomSheet({
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
       <DrawerContent 
-        direction="bottom" 
         className="max-h-[85vh]"
         style={{
           willChange: open ? 'transform' : 'auto',
