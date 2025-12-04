@@ -1,96 +1,40 @@
-import type { LucideIcon } from "lucide-react";
-import { Flame, Star, Store, TrendingUp, Zap } from "lucide-react";
+import { Flame, Sparkles, Clock, Heart } from "lucide-react";
+import type { SpotConfig } from "./types/spots";
 
-export type DealSectionType = "topDeals" | "megaDeals" | "popular" | "storeDeals";
-
-export const HEADER_VIBE_TAGS = [
-  "Exclusive drops",
-  "Limited stock",
-  "Price drops",
-  "Editors' picks",
-] as const;
-
-export const DEFAULT_PRODUCTS_FETCH_COUNT = 30;
-export const POPULAR_PRODUCTS_FETCH_POLICY = "cache-first";
-
-export const PRODUCT_SECTION_ITEM_LIMIT = 5;
-
-export const FEATURED_STORE_FALLBACK_NAME = "Mock Shop";
-
-export const DEAL_SECTION_META: Record<
-  DealSectionType,
-  { title: string; subtitle: string }
-> = {
-  topDeals: {
-    title: "Top Deals",
-    subtitle: "Hand-picked price drops you can’t miss",
-  },
-  megaDeals: {
-    title: "Mega Deals",
-    subtitle: "50% off and beyond",
-  },
-  popular: {
-    title: "Popular Picks",
-    subtitle: "Loved by thousands of shoppers",
-  },
-  storeDeals: {
-    title: "Store-wise Deals",
-    subtitle: "Store spotlight",
-  },
-};
-
-export const DEAL_SECTION_ICON_MAP: Record<DealSectionType, LucideIcon> = {
-  topDeals: TrendingUp,
-  megaDeals: Zap,
-  popular: Star,
-  storeDeals: Store,
-};
-
-export type QuickActionConfig = {
-  key: string;
-  label: string;
-  copy: string;
-  icon: LucideIcon;
-  type: DealSectionType;
-};
-
-export const QUICK_ACTION_CONFIG: QuickActionConfig[] = [
+export const SPOT_CONFIGS: SpotConfig[] = [
   {
-    key: "quick-top-deals",
-    label: "Top Deals",
-    copy: "Best price drops",
-    icon: TrendingUp,
-    type: "topDeals",
-  },
-  {
-    key: "quick-mega-deals",
-    label: "Mega Drops",
-    copy: "50%+ savings",
+    id: "trending",
+    title: "Trending Spot",
+    subtitle: "Discover what's popular across Shop.",
+    description: "See what's hot right now.",
     icon: Flame,
-    type: "megaDeals",
+    path: "/trending",
   },
   {
-    key: "quick-popular",
-    label: "Popular Picks",
-    copy: "Loved by shoppers",
-    icon: Star,
-    type: "popular",
+    id: "recommended",
+    title: "Recommended Spot",
+    subtitle: "Hand-picked for you by Shop.",
+    description: "Personalized just for you.",
+    icon: Sparkles,
+    path: "/recommended",
   },
   {
-    key: "quick-store",
-    label: "Store Picks",
-    copy: "Store spotlight",
-    icon: Store,
-    type: "storeDeals",
+    id: "recent",
+    title: "Recent Spot",
+    subtitle: "Pick up where you left off.",
+    description: "Continue exploring.",
+    icon: Clock,
+    path: "/recent",
   },
-] as const;
-
-export const SECTION_ORDER: DealSectionType[] = [
-  "topDeals",
-  "megaDeals",
-  "popular",
-  "storeDeals",
+  {
+    id: "saved",
+    title: "Saved Spot",
+    subtitle: "Your favorites in one place.",
+    description: "Your saved items.",
+    icon: Heart,
+    path: "/saved",
+  },
 ];
 
-export const SHOP_ALL_BUTTON_CLASSNAME =
-  "w-full rounded-2xl py-3.5 text-sm font-bold bg-gradient-to-r from-[#3E5879] to-[#213555] text-white shadow-lg active:shadow-xl transition-all duration-300 border-0";
+export const DEFAULT_PRODUCTS_FETCH_COUNT = 30;
+export const POPULAR_PRODUCTS_FETCH_POLICY = "cache-first" as const;

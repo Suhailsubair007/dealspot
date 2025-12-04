@@ -1,201 +1,105 @@
-import {
-  Button,
-  useNavigateWithTransition,
-  usePopularProducts,
-} from "@shopify/shop-minis-react";
-import { useMemo } from "react";
-import type { Product } from "@shopify/shop-minis-react";
-import Header from "../components/Header";
-import SectionScroller from "../components/SectionScroller";
-import {
-  discountPercent,
-  getMegaDeals,
-  getPopularProducts,
-  getStoreWiseDeals,
-  getTopDeals,
-} from "../utils/productUtils";
-import {
-  DEAL_SECTION_META,
-  FEATURED_STORE_FALLBACK_NAME,
-  QUICK_ACTION_CONFIG,
-  SECTION_ORDER,
-  DealSectionType,
-  DEFAULT_PRODUCTS_FETCH_COUNT,
-  POPULAR_PRODUCTS_FETCH_POLICY,
-} from "../constants";
+import { useRecentProducts } from "@shopify/shop-minis-react";
+import ScreenContainer from "../components/layout/ScreenContainer";
+import SpotTile from "../components/common/SpotTile";
+import ProductCard from "../components/product/ProductCard";
+import { SPOT_CONFIGS } from "../constants";
+import SkeletonProductCard from "../components/common/SkeletonProductCard";
 
 export default function HomeScreen() {
-  const navigate = useNavigateWithTransition();
-  const { products: popularProducts, loading: popularProductsLoading } =
-    usePopularProducts({
-      first: DEFAULT_PRODUCTS_FETCH_COUNT,
-      fetchPolicy: POPULAR_PRODUCTS_FETCH_POLICY,
-    });
-
-  const productPool = useMemo(() => popularProducts ?? [], [popularProducts]);
-
-  const topDeals = useMemo(() => getTopDeals(productPool), [productPool]);
-  const megaDeals = useMemo(() => getMegaDeals(productPool), [productPool]);
-  const popular = useMemo(() => getPopularProducts(productPool), [productPool]);
-
-  const storeWiseDeals = useMemo(
-    () => getStoreWiseDeals(productPool),
-    [productPool]
-  );
-
-  const featuredStoreInfo = useMemo(() => {
-    const entries = Object.entries(storeWiseDeals);
-
-    if (entries.length === 0) {
-      return {
-        name: FEATURED_STORE_FALLBACK_NAME,
-        id: null,
-        deals: [],
-      };
-    }
-
-    const [bestStoreName, bestStoreDeals] = entries.reduce<
-      [string, Product[], number]
-    >(
-      (best, [store, deals]) => {
-        if (deals.length === 0) {
-          return best;
-        }
-
-        const highestDiscount = discountPercent(deals[0]);
-
-        if (highestDiscount > best[2]) {
-          return [store, deals, highestDiscount];
-        }
-
-        return best;
-      },
-      ["", [], -Infinity]
-    );
-
-    // Get store ID from the first product in the best store's deals
-    const storeId = bestStoreDeals[0]?.shop?.id ?? null;
-
-    return {
-      name: bestStoreName || FEATURED_STORE_FALLBACK_NAME,
-      id: storeId,
-      deals: bestStoreDeals.slice(0, 5),
-    };
-  }, [storeWiseDeals]);
-
-  const featuredStoreName = featuredStoreInfo.name;
-  const featuredStoreId = featuredStoreInfo.id;
-  const featuredStoreDeals = featuredStoreInfo.deals;
-
-  const quickActions = QUICK_ACTION_CONFIG.map((action) => {
-    const destination =
-      action.type === "storeDeals"
-        ? featuredStoreId
-          ? `/store-deals?storeId=${encodeURIComponent(featuredStoreId)}`
-          : "/store-deals"
-        : action.type === "topDeals"
-        ? "/top-deals"
-        : action.type === "megaDeals"
-        ? "/mega-deals"
-        : action.type === "popular"
-        ? "/popular-picks"
-        : `/full-list?type=${action.type}`;
-
-    const resolvedLabel =
-      action.type === "storeDeals"
-        ? `${featuredStoreName} Picks`
-        : action.label;
-
-    return {
-      key: action.key,
-      label: resolvedLabel,
-      copy: action.copy,
-      icon: action.icon,
-      target: destination,
-    };
-  });
-
-  const sectionProductMap: Record<DealSectionType, typeof topDeals> = {
-    topDeals,
-    megaDeals,
-    popular,
-    storeDeals: featuredStoreDeals,
-  };
-
-  const sectionConfigs = SECTION_ORDER.map((sectionType) => {
-    const meta = DEAL_SECTION_META[sectionType];
-
-    const getShopAllPath = () => {
-      if (sectionType === "storeDeals") {
-        return featuredStoreId
-          ? `/store-deals?storeId=${encodeURIComponent(featuredStoreId)}`
-          : "/store-deals";
-      }
-      if (sectionType === "topDeals") {
-        return "/top-deals";
-      }
-      if (sectionType === "megaDeals") {
-        return "/mega-deals";
-      }
-      if (sectionType === "popular") {
-        return "/popular-picks";
-      }
-      return `/full-list?type=${sectionType}`;
-    };
-
-    return {
-      key: sectionType,
-      sectionType,
-      title: meta.title,
-      subtitle:
-        sectionType === "storeDeals" ? featuredStoreName : meta.subtitle,
-      products: sectionProductMap[sectionType],
-      onShopAll: () => navigate(getShopAllPath()),
-    };
-  });
+  const { products: recentProducts, loading } = useRecentProducts({ first: 6 });
+  
+  // Prevent flicker: show skeleton during initial load or when products is null
+  const isLoading = loading || recentProducts === null;
+  const hasProducts = recentProducts && recentProducts.length > 0;
 
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-b from-[#F5EFE7]/5 via-white to-white pb-10">
-      <Header />
-      <div className="mt-5 grid grid-cols-2 gap-3 px-4">
-        {quickActions.map((action) => {
-          const Icon = action.icon;
-          return (
-            <Button
-              key={action.key}
-              className="flex flex-col items-start gap-2 rounded-2xl border-2 border-[#F5EFE7]/40 bg-white/70 px-4 py-4 text-left shadow-sm active:shadow-lg transition-all duration-300 min-h-[48px] w-full"
-              onClick={() => navigate(action.target)}
-              variant="secondary"
-            >
-              <div className="p-2 rounded-xl bg-gradient-to-br from-[#F5EFE7] to-[#D8C4B6] text-[#213555] shadow-md">
-                <Icon className="w-5 h-5" strokeWidth={2.5} />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-gray-900">
-                  {action.label}
-                </p>
-                <p className="text-xs text-gray-600 font-medium">
-                  {action.copy}
-                </p>
-              </div>
-            </Button>
-          );
-        })}
+    <ScreenContainer>
+      {/* Hero Section */}
+      <div className="px-5 pt-10 pb-8 relative">
+        {/* Decorative background elements */}
+        <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#1A2A80]/10 via-[#3B38A0]/5 to-transparent rounded-full blur-3xl -z-10" />
+        <div className="absolute top-8 left-0 w-24 h-24 bg-gradient-to-br from-[#7A85C1]/10 to-transparent rounded-full blur-2xl -z-10" />
+        
+        <div className="relative">
+          <h1 className="text-6xl font-bold mb-4 leading-[1.1] tracking-tight">
+            <span className="block bg-gradient-to-r from-[#1A2A80] via-[#3B38A0] to-[#7A85C1] bg-clip-text text-transparent drop-shadow-sm">
+              Deal
+            </span>
+            <span className="block bg-gradient-to-r from-[#3B38A0] via-[#7A85C1] to-[#B2B0E8] bg-clip-text text-transparent drop-shadow-sm">
+              Spot
+            </span>
+          </h1>
+          <div className="flex items-center gap-2 mb-1">
+            <div className="h-0.5 w-8 bg-gradient-to-r from-[#1A2A80] to-[#3B38A0] rounded-full" />
+            <p className="text-base text-[#7A85C1] font-medium leading-relaxed">Find your next shopping spot</p>
+          </div>
+        </div>
       </div>
 
-      <div className="space-y-6 mt-6 px-4">
-        {sectionConfigs.map((section) => (
-          <SectionScroller
-            isLoading={popularProductsLoading}
-            key={section.key}
-            title={section.title}
-            sectionType={section.sectionType}
-            subtitle={section.subtitle}
-            products={section.products}
-            onShopAll={section.onShopAll}
+      {/* Spot Tiles Grid */}
+      <div className="px-5 pb-8">
+        <div className="grid grid-cols-2 gap-5">
+          {SPOT_CONFIGS.map((spot) => (
+            <SpotTile
+              key={spot.id}
+              title={spot.title}
+              description={spot.description}
+              icon={spot.icon}
+              path={spot.path}
           />
         ))}
       </div>
     </div>
+
+      {/* Continue Exploring Section */}
+      <div className="px-5 pb-8">
+        <div className="mb-6 relative">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="h-1 w-1 rounded-full bg-gradient-to-r from-[#1A2A80] to-[#3B38A0] animate-pulse" />
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-[#1A2A80] via-[#3B38A0] to-[#7A85C1] bg-clip-text text-transparent leading-tight">
+              Continue exploring
+            </h2>
+          </div>
+          <p className="text-sm text-[#7A85C1] font-medium ml-4">Pick up where you left off</p>
+          {/* Decorative underline */}
+          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#B2B0E8]/30 to-transparent mt-2" />
+        </div>
+        {isLoading ? (
+          <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-3 -mx-5 px-5 scrollbar-hide">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="flex-[0_0_75%] snap-start flex-shrink-0">
+                <div className="relative group">
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-[#1A2A80] via-[#3B38A0] to-[#7A85C1] rounded-3xl opacity-0 group-active:opacity-20 blur transition-opacity duration-300" />
+                  <div className="relative rounded-3xl overflow-hidden bg-white shadow-lg">
+                    <SkeletonProductCard />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : hasProducts ? (
+          <div className="flex gap-4 overflow-x-auto snap-x snap-mandatory pb-3 -mx-5 px-5 scrollbar-hide">
+            {recentProducts.slice(0, 4).map((product) => (
+              <div key={product.id} className="flex-[0_0_75%] snap-start flex-shrink-0">
+                <div className="relative group">
+                  {/* Gradient border effect */}
+                  <div className="absolute -inset-0.5 bg-gradient-to-r from-[#1A2A80] via-[#3B38A0] to-[#7A85C1] rounded-3xl opacity-0 group-active:opacity-30 blur-sm transition-opacity duration-300" />
+                  {/* Card container */}
+                  <div className="relative rounded-3xl overflow-hidden bg-white shadow-lg border border-gray-100/50 backdrop-blur-sm pb-1 max-h-[450px]">
+                    <ProductCard  product={product} className="rounded-3xl" />
+                    {/* Decorative corner accent */}
+                    <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#B2B0E8]/10 to-transparent pointer-events-none" />
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <div className="px-5 py-8 text-center">
+            <p className="text-sm text-[#7A85C1] font-normal">No recent products to show</p>
+          </div>
+        )}
+      </div>
+    </ScreenContainer>
   );
 }

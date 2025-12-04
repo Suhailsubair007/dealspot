@@ -1,11 +1,9 @@
 {
   "name": "dealspot",
+  "description": "Find your next shopping spot - curated discovery experience",
+  "handle": "dealspot",
   "permissions": [],
-  "scopes": [
-    "product_list:write",
-    "product_list:read"
-  ],
+  "scopes": ["product_list:write" , "products:recommendations:read" , "products:recent:read" , "product_list:read"],
   "privacy_policy_url": "https://suhailsubair007.github.io/dealspot/privacy.html",
-  "terms_url": "https://suhailsubair007.github.io/dealspot/terms.html",
-  "handle": "dealspot"
+  "terms_url": "https://suhailsubair007.github.io/dealspot/terms.html"
 }
