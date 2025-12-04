@@ -1,1 +1,28 @@
 @import "@shopify/shop-minis-react/styles";
+
+/* DealSpot Theme Variables - Purple Blue Theme */
+:root {
+  --bg-primary: #f9fafb;
+  --bg-card: #ffffff;
+  --accent-primary: #1A2A80;
+  --accent-secondary: #3B38A0;
+  --accent-tertiary: #7A85C1;
+  --accent-light: #B2B0E8;
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+}
+
+body {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
