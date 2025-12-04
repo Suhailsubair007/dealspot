@@ -20,6 +20,7 @@ export default function SpotTile({
     <button
       onClick={() => navigate(path)}
       className="flex flex-col items-start gap-4 rounded-3xl bg-white px-5 py-6 text-left shadow-sm active:shadow-md active:scale-[0.98] transition-all duration-200 min-h-[140px] w-full active:bg-gradient-to-br active:from-[#B2B0E8]/5 active:to-transparent group"
+      style={{ willChange: 'transform' }}
     >
       <div className="p-3 rounded-2xl bg-gradient-to-br from-[#1A2A80] to-[#3B38A0] text-white shadow-sm group-active:shadow-md transition-shadow">
         <Icon className="w-6 h-6" strokeWidth={2} />

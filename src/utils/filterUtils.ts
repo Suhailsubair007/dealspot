@@ -17,10 +17,17 @@ export function applyProductFilters(
 
     // Price range filter
     const price = parseFloat(product.price.amount);
-    if (!isNaN(price)) {
+    if (isNaN(price)) {
+      // If price is invalid and we have price filters, exclude the product
+      if (filters.minPrice !== undefined || filters.maxPrice !== undefined) {
+        return false;
+      }
+    } else {
+      // Apply min price filter (price must be >= minPrice)
       if (filters.minPrice !== undefined && price < filters.minPrice) {
         return false;
       }
+      // Apply max price filter (price must be <= maxPrice)
       if (filters.maxPrice !== undefined && price > filters.maxPrice) {
         return false;
       }

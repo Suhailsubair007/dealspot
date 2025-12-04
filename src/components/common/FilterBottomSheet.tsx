@@ -85,7 +85,13 @@ export default function FilterBottomSheet({
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange}>
-      <DrawerContent direction="bottom" className="max-h-[85vh]">
+      <DrawerContent 
+        direction="bottom" 
+        className="max-h-[85vh]"
+        style={{
+          willChange: open ? 'transform' : 'auto',
+        }}
+      >
         <DrawerHeader className="pb-4 border-b border-gray-200">
           <div className="flex items-center justify-between">
             <DrawerTitle className="text-xl font-semibold text-[#1A2A80]">
@@ -114,7 +120,7 @@ export default function FilterBottomSheet({
                   <button
                     key={shop}
                     onClick={() => handleShopToggle(shop)}
-                    className={`px-4 py-2 rounded-2xl text-sm font-medium transition-all duration-200 min-h-[44px] ${
+                    className={`px-4 py-2 rounded-2xl text-sm font-medium transition-all duration-200 min-h-[48px] ${
                       filters.shops.includes(shop)
                         ? "bg-gradient-to-r from-[#1A2A80] to-[#3B38A0] text-white shadow-sm"
                         : "bg-gray-100 text-[#7A85C1] active:bg-gray-200"
@@ -142,15 +148,24 @@ export default function FilterBottomSheet({
                     type="number"
                     min={priceRange.min}
                     max={priceRange.max}
-                    value={filters.minPrice || ""}
-                    onChange={(e) =>
-                      onFiltersChange({
-                        ...filters,
-                        minPrice: e.target.value
-                          ? parseFloat(e.target.value)
-                          : undefined,
-                      })
-                    }
+                    value={filters.minPrice ?? ""}
+                    onChange={(e) => {
+                      const value = e.target.value.trim();
+                      if (value === "") {
+                        onFiltersChange({
+                          ...filters,
+                          minPrice: undefined,
+                        });
+                      } else {
+                        const parsed = parseFloat(value);
+                        if (!isNaN(parsed) && parsed >= 0) {
+                          onFiltersChange({
+                            ...filters,
+                            minPrice: parsed,
+                          });
+                        }
+                      }
+                    }}
                     placeholder={`${priceRange.min}`}
                     className="w-full px-4 py-2.5 rounded-2xl border border-gray-200 bg-white text-[#1A2A80] text-sm focus:outline-none focus:ring-2 focus:ring-[#3B38A0]/20 focus:border-[#3B38A0] min-h-[48px]"
                   />
@@ -163,15 +178,24 @@ export default function FilterBottomSheet({
                     type="number"
                     min={priceRange.min}
                     max={priceRange.max}
-                    value={filters.maxPrice || ""}
-                    onChange={(e) =>
-                      onFiltersChange({
-                        ...filters,
-                        maxPrice: e.target.value
-                          ? parseFloat(e.target.value)
-                          : undefined,
-                      })
-                    }
+                    value={filters.maxPrice ?? ""}
+                    onChange={(e) => {
+                      const value = e.target.value.trim();
+                      if (value === "") {
+                        onFiltersChange({
+                          ...filters,
+                          maxPrice: undefined,
+                        });
+                      } else {
+                        const parsed = parseFloat(value);
+                        if (!isNaN(parsed) && parsed >= 0) {
+                          onFiltersChange({
+                            ...filters,
+                            maxPrice: parsed,
+                          });
+                        }
+                      }
+                    }}
                     placeholder={`${priceRange.max}`}
                     className="w-full px-4 py-2.5 rounded-2xl border border-gray-200 bg-white text-[#1A2A80] text-sm focus:outline-none focus:ring-2 focus:ring-[#3B38A0]/20 focus:border-[#3B38A0] min-h-[48px]"
                   />

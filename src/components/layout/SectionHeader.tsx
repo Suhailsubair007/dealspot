@@ -29,13 +29,25 @@ export default function SectionHeader({
   const navigate = useNavigateWithTransition();
 
   return (
-    <div className="bg-gradient-to-r from-[#1A2A80] to-[#3B38A0] pt-6 pb-5 px-5 rounded-b-3xl shadow-sm flex-shrink-0">
+    <div 
+      className="bg-gradient-to-r from-[#1A2A80] to-[#3B38A0] pt-6 pb-5 px-5 rounded-b-3xl shadow-sm flex-shrink-0"
+      style={{
+        viewTransitionName: 'screen-header',
+      }}
+    >
       <div className="flex items-center gap-4">
         {showBackButton && (
           <button
             aria-label="Go back"
             className="p-3 rounded-2xl bg-white/15 active:bg-white/30 transition-all duration-200 min-h-[48px] min-w-[48px] flex items-center justify-center border-0 backdrop-blur-sm"
-            onClick={() => navigate(-1)}
+            onClick={() => {
+              // Fallback to home if no navigation history
+              if (window.history.length > 1) {
+                navigate(-1);
+              } else {
+                navigate('/');
+              }
+            }}
           >
             <ArrowLeft className="w-5 h-5 text-white" strokeWidth={2.5} />
           </button>
@@ -46,9 +58,9 @@ export default function SectionHeader({
           </div>
         )}
         <div className="flex-1 min-w-0">
-          <h2 className="text-xl font-semibold text-white truncate leading-tight">{title}</h2>
+          <h2 className="text-2xl font-bold text-white truncate leading-tight tracking-tight drop-shadow-sm">{title}</h2>
           {subtitle && (
-            <p className="text-sm text-white/90 truncate mt-0.5 leading-relaxed">{subtitle}</p>
+            <p className="text-sm text-white/95 truncate mt-1 leading-relaxed font-medium">{subtitle}</p>
           )}
         </div>
         {showFilterButton && onFilterClick && (

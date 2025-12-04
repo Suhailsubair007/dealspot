@@ -10,7 +10,14 @@ export default function ProductGrid({
   className = "",
 }: ProductGridProps) {
   return (
-    <div className={`grid grid-cols-2 gap-5 px-5 ${className}`}>{children}</div>
+    <div 
+      className={`grid grid-cols-2 gap-5 px-5 ${className}`}
+      style={{ 
+        contain: 'layout style paint',
+      }}
+    >
+      {children}
+    </div>
   );
 }
 

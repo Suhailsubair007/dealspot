@@ -1,3 +1,4 @@
+import { memo } from "react";
 import { ProductCard as SDKProductCard } from "@shopify/shop-minis-react";
 import type { Product } from "@shopify/shop-minis-react";
 
@@ -6,13 +7,18 @@ interface ProductCardProps {
   className?: string;
 }
 
-export default function ProductCard({
+function ProductCard({
   product,
   className = "",
 }: ProductCardProps) {
   return (
     <div
       className={`overflow-hidden bg-transparent transition-all duration-300 active:scale-[0.97] ${className}`}
+      style={{ 
+        willChange: 'transform',
+        viewTransitionName: `product-${product.id}`,
+        contain: 'layout style',
+      }}
     >
       <SDKProductCard product={product} variant="priceOverlay" />
       <div className="px-4 py-4">
@@ -23,3 +29,5 @@ export default function ProductCard({
     </div>
   );
 }
+
+export default memo(ProductCard);
