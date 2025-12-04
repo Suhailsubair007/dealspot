@@ -6,7 +6,7 @@ import { SPOT_CONFIGS } from "../constants";
 import SkeletonProductCard from "../components/common/SkeletonProductCard";
 
 export default function HomeScreen() {
-  const { products: recentProducts, loading } = useRecentProducts({ first: 4 });
+  const { products: recentProducts, loading } = useRecentProducts({ first: 6 });
   
   // Prevent flicker: show skeleton during initial load or when products is null
   const isLoading = loading || recentProducts === null;
@@ -64,8 +64,8 @@ export default function HomeScreen() {
                   {/* Gradient border effect */}
                   <div className="absolute -inset-0.5 bg-gradient-to-r from-[#1A2A80] via-[#3B38A0] to-[#7A85C1] rounded-3xl opacity-0 group-active:opacity-30 blur-sm transition-opacity duration-300" />
                   {/* Card container */}
-                  <div className="relative rounded-3xl overflow-hidden bg-white shadow-lg border border-gray-100/50 backdrop-blur-sm pb-1">
-                    <ProductCard product={product} className="rounded-3xl" />
+                  <div className="relative rounded-3xl overflow-hidden bg-white shadow-lg border border-gray-100/50 backdrop-blur-sm pb-1 max-h-[450px]">
+                    <ProductCard  product={product} className="rounded-3xl" />
                     {/* Decorative corner accent */}
                     <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#B2B0E8]/10 to-transparent pointer-events-none" />
                   </div>
