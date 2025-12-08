@@ -49,4 +49,4 @@ npx shop-minis dev## Testing Steps
 
 ---
 
-**Demo Video**: https://drive.google.com/file/d/1RE3iwzZRc8wMGJ9gP3hl32wx-kivTOu9/view?usp=sharing
+**Demo Video**: https://drive.google.com/file/d/1yNe1VIJEQPjUoCzN-Haz0ugSfStFhPGq/view
