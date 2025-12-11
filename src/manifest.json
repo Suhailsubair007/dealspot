@@ -3,10 +3,7 @@
   "description": "discover top deals & live discounts",
   "handle": "dealspot",
   "permissions": [],
-  "scopes": [
-    "product_list:write",
-    "product_list:read"
-  ],
+  "scopes": ["product_list:write"],
   "privacy_policy_url": "https://suhailsubair007.github.io/dealspot/privacy.html",
   "terms_url": "https://suhailsubair007.github.io/dealspot/terms.html"
 }
