@@ -1,24 +1,27 @@
-import { useNavigateWithTransition } from "@shopify/shop-minis-react";
 import type { LucideIcon } from "lucide-react";
 
 interface SpotTileProps {
   title: string;
   description: string;
   icon: LucideIcon;
-  path: string;
+  onClick?: () => void;
 }
 
 export default function SpotTile({
   title,
   description,
   icon: Icon,
-  path,
+  onClick,
 }: SpotTileProps) {
-  const navigate = useNavigateWithTransition();
+  const handleClick = () => {
+    if (onClick) {
+      onClick();
+    }
+  };
 
   return (
     <button
-      onClick={() => navigate(path)}
+      onClick={handleClick}
       className="flex flex-col items-start gap-4 rounded-3xl bg-white px-5 py-6 text-left shadow-sm active:shadow-md active:scale-[0.98] transition-all duration-200 min-h-[140px] w-full active:bg-gradient-to-br active:from-[#B2B0E8]/5 active:to-transparent group"
       style={{ willChange: 'transform' }}
     >

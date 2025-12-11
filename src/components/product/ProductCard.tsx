@@ -11,23 +11,33 @@ function ProductCard({
   product,
   className = "",
 }: ProductCardProps) {
-  return (
-    <div
-      className={`overflow-hidden bg-transparent transition-all duration-300 active:scale-[0.97] ${className}`}
-      style={{ 
-        willChange: 'transform',
-        viewTransitionName: `product-${product.id}`,
-        contain: 'layout style',
-      }}
-    >
-      <SDKProductCard product={product} variant="priceOverlay" />
-      <div className="px-4 py-4">
-        <h3 className="text-sm font-semibold text-[#1A2A80] line-clamp-2 leading-snug tracking-tight">
-          {product.title}
-        </h3>
+  // Safety check - if product is invalid, don't render
+  if (!product || !product.id) {
+    return null;
+  }
+
+  try {
+    return (
+      <div
+        className={`overflow-hidden bg-transparent transition-all duration-300 active:scale-[0.97] ${className}`}
+        style={{ 
+          willChange: 'transform',
+          viewTransitionName: `product-${product.id}`,
+          contain: 'layout style',
+        }}
+      >
+        <SDKProductCard product={product} variant="priceOverlay" />
+        <div className="px-4 py-4">
+          <h3 className="text-sm font-semibold text-[#1A2A80] line-clamp-2 leading-snug tracking-tight">
+            {product.title || "Untitled Product"}
+          </h3>
+        </div>
       </div>
-    </div>
-  );
+    );
+  } catch (error) {
+    console.error("Error rendering ProductCard:", error, product);
+    return null;
+  }
 }
 
 export default memo(ProductCard);

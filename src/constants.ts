@@ -36,5 +36,5 @@ export const SPOT_CONFIGS: SpotConfig[] = [
   },
 ];
 
-export const DEFAULT_PRODUCTS_FETCH_COUNT = 30;
+export const DEFAULT_PRODUCTS_FETCH_COUNT = 100;
 export const POPULAR_PRODUCTS_FETCH_POLICY = "cache-first" as const;

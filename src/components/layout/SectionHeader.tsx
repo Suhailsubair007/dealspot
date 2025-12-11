@@ -1,5 +1,4 @@
 import { ArrowLeft, SlidersHorizontal } from "lucide-react";
-import { useNavigateWithTransition } from "@shopify/shop-minis-react";
 import type { LucideIcon } from "lucide-react";
 
 interface SectionHeaderProps {
@@ -7,6 +6,7 @@ interface SectionHeaderProps {
   subtitle?: string;
   icon?: LucideIcon;
   showBackButton?: boolean;
+  onBackClick?: () => void;
   showFilterButton?: boolean;
   onFilterClick?: () => void;
   hasActiveFilters?: boolean;
@@ -20,13 +20,13 @@ export default function SectionHeader({
   title,
   subtitle,
   icon: Icon,
-  showBackButton = true,
+  showBackButton = false,
+  onBackClick,
   showFilterButton = false,
   onFilterClick,
   hasActiveFilters = false,
   action,
 }: SectionHeaderProps) {
-  const navigate = useNavigateWithTransition();
 
   return (
     <div 
@@ -36,18 +36,11 @@ export default function SectionHeader({
       }}
     >
       <div className="flex items-center gap-4">
-        {showBackButton && (
+        {showBackButton && onBackClick && (
           <button
             aria-label="Go back"
             className="p-3 rounded-2xl bg-white/15 active:bg-white/30 transition-all duration-200 min-h-[48px] min-w-[48px] flex items-center justify-center border-0 backdrop-blur-sm"
-            onClick={() => {
-              // Fallback to home if no navigation history
-              if (window.history.length > 1) {
-                navigate(-1);
-              } else {
-                navigate('/');
-              }
-            }}
+            onClick={onBackClick}
           >
             <ArrowLeft className="w-5 h-5 text-white" strokeWidth={2.5} />
           </button>
