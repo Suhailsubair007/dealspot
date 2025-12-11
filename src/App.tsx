@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import SplashScreen from "./components/SplashScreen";
 import HomeScreen from "./screens/HomeScreen";
 import SearchScreen from "./screens/SearchScreen";
@@ -24,10 +24,11 @@ export default function App() {
     setSearchCategory("");
   };
 
-  const handleSplashComplete = () => {
+  // Memoize handleSplashComplete to prevent SplashScreen useEffect from re-running
+  const handleSplashComplete = useCallback(() => {
     hasCompletedFirstLoad.current = true;
     setShowSplash(false);
-  };
+  }, []);
 
   return (
     <>
