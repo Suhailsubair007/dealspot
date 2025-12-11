@@ -32,13 +32,13 @@ export default function MainScreen() {
         {/* Main Heading */}
         <div className="px-6 pt-6 pb-3 relative flex-shrink-0">
           <div className="relative flex items-center gap-3">
-            <h1 className="text-2xl font-black leading-none tracking-tight">
+            <h1 className="text-5xl font-black leading-none tracking-tight" style={{ fontFamily: 'Inter, sans-serif' }}>
               <span className="inline-block bg-gradient-to-r from-[#6F4E37] via-[#A67B5B] to-[#ECB176] bg-clip-text text-transparent">
                 DealSpot
               </span>
             </h1>
-            <div className="h-1 w-1 rounded-full bg-gradient-to-r from-[#6F4E37] to-[#A67B5B] animate-pulse" />
-            <p className="text-xs text-[#6F4E37]/70 font-semibold leading-tight">
+            <div className="h-1.5 w-1.5 rounded-full bg-gradient-to-r from-[#6F4E37] to-[#A67B5B] animate-pulse" />
+            <p className="text-sm text-[#6F4E37]/70 font-semibold leading-tight" style={{ fontFamily: 'Inter, sans-serif' }}>
               Smart Bundles
             </p>
           </div>

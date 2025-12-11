@@ -36,7 +36,7 @@ export default function ActivitySection() {
   return (
     <div className="px-6 py-6 space-y-6">
       <div className="flex items-center gap-3">
-        <h2 className="text-2xl font-black leading-none tracking-tight">
+        <h2 className="text-lg font-bold leading-none tracking-tight">
           <span className="inline-block bg-gradient-to-r from-[#6F4E37] via-[#A67B5B] to-[#ECB176] bg-clip-text text-transparent">
             What are you up to?
           </span>
