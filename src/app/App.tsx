@@ -1,5 +1,5 @@
 import { useState } from "react";
-import Router from "./router";
+import MainScreen from "../screens/MainScreen";
 import SplashScreen from "../components/SplashScreen";
 import ErrorBoundary from "../components/common/ErrorBoundary";
 
@@ -21,7 +21,7 @@ export default function App() {
         }}
       >
         <ErrorBoundary>
-          <Router />
+          <MainScreen />
         </ErrorBoundary>
       </div>
     </ErrorBoundary>

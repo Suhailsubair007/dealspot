@@ -1,28 +1,45 @@
 @import "@shopify/shop-minis-react/styles";
 
-/* DealSpot Theme Variables - Purple Blue Theme */
+/* DealSpot Modern Theme - Brown/Cream Theme */
 :root {
-  --bg-primary: #f9fafb;
-  --bg-card: #ffffff;
-  --accent-primary: #1A2A80;
-  --accent-secondary: #3B38A0;
-  --accent-tertiary: #7A85C1;
-  --accent-light: #B2B0E8;
+  --gradient-primary: linear-gradient(135deg, #6F4E37 0%, #A67B5B 33%, #ECB176 66%, #FED8B1 100%);
+  --gradient-secondary: linear-gradient(180deg, #FED8B1 0%, #ECB176 50%, #A67B5B 100%);
+  --accent-primary: #6F4E37;
+  --accent-secondary: #A67B5B;
+  --accent-tertiary: #ECB176;
+  --accent-light: #FED8B1;
   --text-primary: #111827;
-  --text-secondary: #6b7280;
+  --text-secondary: rgba(111, 78, 55, 0.7);
 }
 
 body {
-  background-color: var(--bg-primary);
+  background: #FED8B1;
   color: var(--text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Hide scrollbar but keep functionality */
 .scrollbar-hide {
   -ms-overflow-style: none;
   scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
 }
 
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+  width: 0;
+  height: 0;
+}
+
+/* Smooth scrolling */
+* {
+  scroll-behavior: smooth;
+}
+
+/* Glassmorphism effect */
+.glass {
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
