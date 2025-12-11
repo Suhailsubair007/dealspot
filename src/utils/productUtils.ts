@@ -1,5 +1,4 @@
 import type { Product } from "@shopify/shop-minis-react";
-import { PRODUCT_SECTION_ITEM_LIMIT } from "../constants";
 
 const getScale = (amount: string): number => {
   const [, fraction = ""] = amount.split(".");
@@ -73,74 +72,5 @@ export const discountPercent = (product: Product): number => {
   return Number(percentBasisPoints) / 100;
 };
 
-export const getRating = (product: Product): number =>
-  product.reviewAnalytics?.averageRating ?? 0;
-
-export const getReviewCount = (product: Product): number =>
-  product.reviewAnalytics?.reviewCount ?? 0;
-
 export const sortByDiscountDesc = (a: Product, b: Product): number =>
   discountPercent(b) - discountPercent(a);
-
-export const getTopDeals = (products: Product[]): Product[] =>
-  products
-    .filter(isDiscounted)
-    .sort(sortByDiscountDesc)
-    .slice(0, PRODUCT_SECTION_ITEM_LIMIT);
-
-export const getMegaDeals = (products: Product[]): Product[] =>
-  products
-    .filter((product) => discountPercent(product) >= 50)
-    .sort(sortByDiscountDesc)
-    .slice(0, PRODUCT_SECTION_ITEM_LIMIT);
-
-export const getPopularProducts = (products: Product[]): Product[] =>
-  products
-    .filter((product) => getRating(product) >= 4)
-    .sort((a, b) => {
-      const reviewDifference = getReviewCount(b) - getReviewCount(a);
-
-      if (reviewDifference !== 0) {
-        return reviewDifference;
-      }
-
-      const ratingDifference = getRating(b) - getRating(a);
-
-      if (ratingDifference !== 0) {
-        return ratingDifference;
-      }
-
-      return discountPercent(b) - discountPercent(a);
-    })
-    .slice(0, PRODUCT_SECTION_ITEM_LIMIT);
-
-export const getStoreWiseDeals = (
-  products: Product[]
-): Record<string, Product[]> => {
-  const grouped = products
-    .filter(isDiscounted)
-    .reduce<Record<string, Product[]>>((acc, product) => {
-      const shopName = product.shop?.name ?? "Unknown Shop";
-
-      if (!acc[shopName]) {
-        acc[shopName] = [];
-      }
-
-      acc[shopName].push(product);
-
-      return acc;
-    }, {});
-
-  return sortStoreDealsByDiscount(grouped);
-};
-
-export const sortStoreDealsByDiscount = (
-  storeDeals: Record<string, Product[]>
-): Record<string, Product[]> =>
-  Object.entries(storeDeals).reduce<Record<string, Product[]>>(
-    (acc, [store, deals]) => {
-      acc[store] = [...deals].sort(sortByDiscountDesc);
-      return acc;
-    },
-    {}
-  );
